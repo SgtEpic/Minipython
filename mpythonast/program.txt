@@ -1,12 +1,27 @@
 class A:
-def a(b,c):
-print(b)
-#end
+d = 5
+    def r(b,c):
+        print("a")
+    #end
+    class B(A):
+        c = 5
+        def func():
+            f=1
+        #end
+    #end
+
+    b = B()
+
 #end
 
-class B(A):
+class C(A):
 #end
 
-b = B()
+a= A()
+a.d = 3
+a.r()
 
-b.a()
+def test(b,c):
+    print("a")
+#end
+test(1,2)

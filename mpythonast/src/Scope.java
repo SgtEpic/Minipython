@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class Scope {
+public class Scope implements Type{
     private HashMap<String,Symbol> symbols;
 
 
@@ -13,8 +13,14 @@ public class Scope {
 
     private final int depth;
 
+
+
     private Clazz clazz = null;
 
+    //ClassLogic
+    private Type type;
+    private Symbol classSymbol;
+    private Scope parentClass;
 
 
     public Scope(){
@@ -30,11 +36,31 @@ public class Scope {
         this.clazz = clazz;
     }
 
+
     public Scope(Scope enclosingScope){
         symbols = new HashMap<>();
         this.enclosingScope = enclosingScope;
         this.depth = enclosingScope.depth + 1;
     }
+
+
+    public Scope(Scope enclosingScope, Symbol classSymbol){
+        symbols = new HashMap<>();
+        this.enclosingScope = enclosingScope;
+        this.depth = enclosingScope.depth + 1;
+        this.classSymbol = classSymbol;
+    }
+    public Scope(Scope enclosingScope, Symbol classSymbol, Scope parentClass){
+        symbols = new HashMap<>();
+        this.enclosingScope = enclosingScope;
+        this.classSymbol = classSymbol;
+        this.parentClass = parentClass;
+        this.depth = enclosingScope.depth + 1;
+    }
+
+
+
+
 
     public Scope(Scope enclosingScope, HashMap<String,Symbol> symbols){
         this.symbols = new HashMap<>(symbols);
@@ -59,17 +85,36 @@ public class Scope {
 
     }
 
-    public Symbol resolve_member(String name){
-        if(clazz == null){
-            return null;
+    public Symbol resolve_member(String[] names, int index){
+        if(names.length <= index ) {
+
+            return symbols.get(names[index-1]);
         }
-        if (symbols.containsKey(name)){
-            return symbols.get(name);
-        } else if(clazz.getParent() != null) {
-            return clazz.getParent().getScope().resolve_member(name);
+        if (symbols.containsKey(names[index])){
+            if(names.length <= index ) {
+                return symbols.get(names[index]);
+            }
+            else{
+                index++;
+                return resolve_member(names, index);
+            }
+
+        } else if(parentClass != null) {
+            return parentClass.resolve_member(names, index);
         }
 
         return null;
+
+    }
+
+    public Symbol resolve_members(String[] names){
+        int counter = 0;
+        if(type == null){
+            return null;
+        }
+
+
+        return resolve_member(names, 0);
     }
 
     public Scope getEnclosingScope() {
@@ -88,14 +133,18 @@ public class Scope {
         this.functionSymbol = functionSymbol;
     }
 
+    public Type getType() {
+        return type;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
+    }
+
     public void print() {
         for (String key : symbols.keySet()) {
             System.out.println(this.depth + ": " + key);
         }
-        if (enclosingScope != null) {
-            enclosingScope.print();
-        }
-        //System.out.println(this.depth);
         System.out.println("");
     }
 

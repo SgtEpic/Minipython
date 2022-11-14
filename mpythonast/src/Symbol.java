@@ -1,7 +1,16 @@
 
-public abstract class Symbol {
+public class Symbol {
 
     protected String name;
+
+    public Type getType() {
+        return type;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
+    }
+
     protected Type type;
     protected Scope scope;
 
@@ -11,6 +20,12 @@ public abstract class Symbol {
 
     public Symbol(String name){
         this.name = name;
+    }
+
+    public Symbol(String name, Type type){
+        this.name = name;
+        this.type = type;
+
     }
 
     public Symbol(String name, Scope scope){
