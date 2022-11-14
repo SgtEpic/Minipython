@@ -1,3 +1,1 @@
-if a == 5:
-    return a
-#end
+a = 5

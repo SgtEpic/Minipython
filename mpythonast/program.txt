@@ -1,0 +1,12 @@
+class A:
+def a(b,c):
+print(b)
+#end
+#end
+
+class B(A):
+#end
+
+b = B()
+
+b.a()
