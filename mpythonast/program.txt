@@ -21,6 +21,8 @@ a= A()
 a.d = 3
 a.r()
 
+a.d()
+
 def test(b,c):
     print("a")
 #end

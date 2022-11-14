@@ -234,23 +234,8 @@ public class SymboltableListener {
                     addError( member_names + " do not exist", member_names[0], node);
                 }
             }
-//            OLD
-//            int index_point = node_name.indexOf(".");
-//            String instance_name = node_name.substring(0, index_point);
-//            String member_name = node_name.substring(index_point+1);
-//            Symbol instance = scope.resolve(instance_name);
-//
-//            if(instance == null){
-//                addError(instance_name + " doesn't exist", instance_name, node);
-//            } else {
-//                Instance inst = (Instance) instance;
-//                System.out.println(inst.getClazz().name);
-//                inst.getClazz().getScope().print();
-//                if(inst.getClazz().getScope().resolve_member(member_name) == null){
-//                    addError(member_name + " does not exist", member_name, node);
-//                }
-//            }
-//        } else {
+            //für Fälle wie a()
+        } else {
             Symbol func = scope.resolve(node.children.get(0).name);
             if(func instanceof Variable) {
                 addError(func.name + " is not a function", func.name, node);
