@@ -3,4 +3,18 @@ class Person:
     self.name = name
     self.age = age
 #end
+
+  def my(self):
+    print("Hello my name is " + self.name)
 #end
+
+  def myfunc(self):
+    self.my()
+    print("Hello my name is " + self.name)
+#end
+#end
+p1 = Person("John", 36)
+p1.myfunc("hello", 5)
+
+
+

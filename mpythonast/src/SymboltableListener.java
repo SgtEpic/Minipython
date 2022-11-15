@@ -168,6 +168,16 @@ public class SymboltableListener {
         //für Fälle wie a = 5 oder a.e = 5
         }else {
             String node_name = node.children.get(0).name;
+
+            //checks if self is in the string
+            if(node_name.contains(".")) {
+                int index_point = node_name.indexOf(".");
+                String instance_name = node_name.substring(0, index_point);
+                if(instance_name.equals("self")){
+                    node_name = node_name.substring(index_point+1);
+                }
+            }
+            System.out.println(node_name);
             //für a.e = 5
             if(node_name.contains(".")) {
                 int index_point = node_name.indexOf(".");
@@ -181,6 +191,7 @@ public class SymboltableListener {
                 } else {
                     //instance.getType() gets the Scope of the Class
                     Scope classScope = (Scope) instance.getType();
+
                     if (classScope == null) {
                         errors.addError(member_names + " has no Scope", member_names[0], node, scope);
                     } else {
@@ -220,6 +231,15 @@ public class SymboltableListener {
     //WIP
     private void enter_function_call_node(FunctionCall node) {
         String node_name = node.children.get(0).name;
+
+        //checks if self is in the string
+        if(node_name.contains(".")) {
+            int index_point = node_name.indexOf(".");
+            String instance_name = node_name.substring(0, index_point);
+            if(instance_name.equals("self")){
+                node_name = node_name.substring(index_point+1);
+            }
+        }
         //für Fälle wie a.b()
         if(node_name.contains(".")){
             int index_point = node_name.indexOf(".");
