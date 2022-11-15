@@ -4,7 +4,8 @@ import java.util.HashMap;
 public class Scope implements Type{
     private HashMap<String,Symbol> symbols;
 
-
+    private ArrayList<Scope> children = new ArrayList<>();
+    private String name;
 
     private Scope enclosingScope;
 
@@ -27,6 +28,9 @@ public class Scope implements Type{
         this.symbols = new HashMap<>();
         this.enclosingScope = null;
         this.depth = 0;
+        if(enclosingScope != null){
+            enclosingScope.children.add(this);
+        }
     }
 
     public Scope(Scope enclosingScope, Clazz clazz){
@@ -41,6 +45,9 @@ public class Scope implements Type{
         symbols = new HashMap<>();
         this.enclosingScope = enclosingScope;
         this.depth = enclosingScope.depth + 1;
+        if(enclosingScope != null){
+            enclosingScope.children.add(this);
+        }
     }
 
 
@@ -49,6 +56,9 @@ public class Scope implements Type{
         this.enclosingScope = enclosingScope;
         this.depth = enclosingScope.depth + 1;
         this.classSymbol = classSymbol;
+        if(enclosingScope != null){
+            enclosingScope.children.add(this);
+        }
     }
     public Scope(Scope enclosingScope, Symbol classSymbol, Scope parentClass){
         symbols = new HashMap<>();
@@ -56,7 +66,11 @@ public class Scope implements Type{
         this.classSymbol = classSymbol;
         this.parentClass = parentClass;
         this.depth = enclosingScope.depth + 1;
+        if(enclosingScope != null){
+            enclosingScope.children.add(this);
+        }
     }
+
 
 
 
@@ -106,6 +120,9 @@ public class Scope implements Type{
             }else{
                 return resolve_member(names, index);
             }
+        //look in parent class
+        }else if(parentClass != null) {
+            return parentClass.resolve_member(names, index);
 
         }
 
@@ -122,6 +139,14 @@ public class Scope implements Type{
 
         return resolve_member(names, 0);
     }
+
+    public void printChildren(){
+        print();
+        for(Scope child: children){
+            child.printChildren();
+        }
+    }
+
 
     public Scope getEnclosingScope() {
         return enclosingScope;
@@ -148,6 +173,7 @@ public class Scope implements Type{
     }
 
     public void print() {
+        System.out.println(name);
         for (String key : symbols.keySet()) {
             System.out.println(this.depth + ": " + key);
         }
@@ -161,4 +187,13 @@ public class Scope implements Type{
     public Symbol getClazz(){
         return this.clazz;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
 }

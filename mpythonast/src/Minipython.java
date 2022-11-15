@@ -4,7 +4,6 @@ import org.antlr.v4.runtime.*;
 public class Minipython {
     public static void main(String[] args) throws Exception {
         // create a CharStream that reads from standard input
-        System.out.println("nonono");
         minipythonLexer lexer = new minipythonLexer(CharStreams.fromFileName("program.txt"));
 
         // create a buffer of tokens pulled from the lexer

@@ -1,20 +1,35 @@
-class Person:
- def __init__(self, name, age):
-    self.name = name
-    self.age = age
+a= 2
+if a == 2:
+    print("a is ", a)
 #end
 
-  def my(self):
-    print("Hello my name is " + self.name)
+if a == 2:
+print("a is ", a)
+elif a == 3:
+print("a is ", a)
+else:
+print("a is neither 2 and 3")
 #end
 
-  def myfunc(self):
-    self.my()
-    print("Hello my name is " + self.name)
+x = 3
+y = a+x
+while(x>y):
+    print(x ,"is bigger than ",y)
+    x=x-1
+#end
+
+def foo():
+print("ich bin eine Funktion")
+#end
+
+class A:
+def foo(self):
+    print("Ich bin eine Methode von A")
 #end
 #end
-p1 = Person("John", 36)
-p1.myfunc("hello", 5)
 
-
-
+class B(A): #Vererbung B erbt von A
+def foo(self):
+    print("Ich bin eine Methode von B")
+#end
+#end
