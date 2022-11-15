@@ -8,20 +8,35 @@ d = 5
         def func():
             f=1
         #end
+        thus = r(5,6)
+        andsoon = t(5,6)
     #end
 
     b = B()
 
 #end
 
+a= A()
+rewq = T()
+
+a.b.func() #check calling function
+a.b.func() = 3 #check assigning function
+a.b.func = 3 #check assigning function that isnt properly called
+
+a.d.c = 3 #check calling member of variable
+
+hi = 5
+jo()
+
 class C(A):
 #end
 
-a= A()
-a.d = 3
-a.r()
+z = hi()
 
-a.d()
+a.d = 3 # assigning variable
+a.r() #calling function as function
+
+a.d()  #calling variable as function
 
 def test(b,c):
     print("a")

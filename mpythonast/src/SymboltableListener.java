@@ -6,32 +6,18 @@ public class SymboltableListener {
     //current Scope
     Scope scope;
 
-    //stores occured errors which can be printed at the end of the traversal
-    ArrayList<SymboltableErr> errors = new ArrayList<>();
-
-    //
-    private void addError(String message, String symbol_name, Node node){
-        if(errors.isEmpty()){
-            errors.add(new SymboltableErr(message, symbol_name, scope, node));
-        } else {
-            for(SymboltableErr err: errors){
-                if(!Objects.equals(err.symbol, symbol_name) || err.scope != scope){
-                    errors.add(new SymboltableErr(message, symbol_name, scope, node));
-                    break;
-                }
-            }
-        }
-    }
+    static ErrorHandler errors = new ErrorHandler();
 
     public boolean walk(Node node){
         walk_node(node);
         if(!errors.isEmpty()){
-            for(SymboltableErr error: errors){
+            for(SymboltableErr error: errors.getErrorList()){
                 System.err.println(error);
             }
 //            throw new RuntimeException("There were errors");
             return false;
         }
+        printTableOfScope();
         return true;
     }
 
@@ -101,7 +87,7 @@ public class SymboltableListener {
         //gets name of the function
         Function func = new Function(node.children.get(0).name);
         scope.bind(func);
-        scope.print();
+        //scope.print();
         //inside of the function body
         scope = new Scope(scope);
     }
@@ -164,10 +150,19 @@ public class SymboltableListener {
         //für z.B. a = A()
         if(!node.children.get(1).children.isEmpty()){
             Symbol symbol = scope.resolve(node.children.get(1).children.get(0).name);
-            if(symbol.getType() != null){
+            if(symbol == null){
+                errors.addError(node.children.get(1).children.get(0).name + " not found", node.children.get(1).children.get(0).name, node, scope);
+            }
+            //is = A() a class?
+            else if(symbol.getType() != null){
                 scope.bind(new Symbol(node.children.get(0).name, symbol.getType()));
-            }else{
-                addError(symbol.name + " is not a Class and thus has no members", symbol.name, node);
+            //it's a function if not a variable
+            }else if (!(symbol instanceof Variable)){
+                Variable var = new Variable(node.children.get(0).name);
+                scope.bind(var);
+            }
+                else{
+                errors.addError(symbol.name + " is not a function nor class", symbol.name, node, scope);
             }
         //für Fälle wie a = 5 oder a.e = 5
         }else {
@@ -181,14 +176,17 @@ public class SymboltableListener {
                 //find a
                 Symbol instance = scope.resolve(instance_name);
                 if(instance == null){
-                    addError(instance_name + " doesn't exist", instance_name, node);
+                    errors.addError(instance_name + " doesn't exist", instance_name, node, scope);
                 } else {
                     //instance.getType() gets the Scope of the Class
                     Scope classScope = (Scope)instance.getType();
                     //find e (or all members after 'a.' that might follow
                     //if not all are found, addError
-                    if(classScope.resolve_members(member_names)== null){
-                        addError( member_names + " do not exist", member_names[0], node);
+                    Symbol lastMember =classScope.resolve_members(member_names);
+                    if(lastMember== null){
+                        errors.addError( member_names + " do not exist", member_names[0], node, scope);
+                    }else if(!(lastMember instanceof Variable)){
+                        errors.addError( lastMember.name + " not a Variable that can be assigned to", member_names[member_names.length -1], node, scope);
                     }
                 }
 
@@ -227,18 +225,21 @@ public class SymboltableListener {
 
 
             if(instance == null){
-                addError(instance_name + " doesn't exist", instance_name, node);
+                errors.addError(instance_name + " doesn't exist", instance_name, node, scope);
             } else {
                 Scope classScope = (Scope)instance.getType();
-                if(classScope.resolve_members(member_names)== null){
-                    addError( member_names + " do not exist", member_names[0], node);
+                Symbol lastMember =classScope.resolve_members(member_names);
+                if(lastMember== null){
+                    errors.addError( member_names + " do not exist", member_names[0], node, scope);
+                }else if(lastMember instanceof Variable){
+                    errors.addError(lastMember.name + " is not a function", lastMember.name, node, scope);
                 }
             }
             //für Fälle wie a()
         } else {
             Symbol func = scope.resolve(node.children.get(0).name);
             if(func instanceof Variable) {
-                addError(func.name + " is not a function", func.name, node);
+                errors.addError(func.name + " is not a function", func.name, node, scope);
 //            throw new Exception(func.name + " is not a function");
             }
         }
@@ -371,7 +372,7 @@ public class SymboltableListener {
     private void exit_statement_node(StatementBlock node){
 
         if(scope.getType() == null){
-            printTableOfScope();
+            //printTableOfScope();
             scope =scope.getEnclosingScope();
         }
     }
@@ -396,7 +397,7 @@ public class SymboltableListener {
         //a.e should not be checked
         if(!node.name.contains(".")){
             if(scope.resolve(node.name) == null){
-                addError("Could not find symbol: " + node.name, node.name, node);
+                errors.addError("Could not find symbol: " + node.name, node.name, node, scope);
 //            throw new Exception("Could not find symbol: " + node.name);
             }
         }

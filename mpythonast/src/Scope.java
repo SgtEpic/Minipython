@@ -86,21 +86,27 @@ public class Scope implements Type{
     }
 
     public Symbol resolve_member(String[] names, int index){
+        //all names processed
         if(names.length <= index ) {
 
             return symbols.get(names[index-1]);
         }
+        //member exists
         if (symbols.containsKey(names[index])){
-            if(names.length <= index ) {
-                return symbols.get(names[index]);
-            }
-            else{
-                index++;
+
+            Symbol foundMember = symbols.get(names[index]);
+            //point to next member
+            index++;
+            //foundMember is a class
+            if(foundMember.getType() != null) {
+                //go into Scope of member class and search there for next member
+                Scope memberScope = (Scope) foundMember.getType();
+                return memberScope.resolve_member(names, index);
+            //found member is not a class
+            }else{
                 return resolve_member(names, index);
             }
 
-        } else if(parentClass != null) {
-            return parentClass.resolve_member(names, index);
         }
 
         return null;
