@@ -80,6 +80,7 @@ public class SymboltableListener {
     private void enter_program_node(Program node){
         scope= new Scope();
         scope.bind(new BuiltIn("print"));
+        scope.bind(new BuiltIn("self"));
     }
 
     //
@@ -179,14 +180,18 @@ public class SymboltableListener {
                     errors.addError(instance_name + " doesn't exist", instance_name, node, scope);
                 } else {
                     //instance.getType() gets the Scope of the Class
-                    Scope classScope = (Scope)instance.getType();
-                    //find e (or all members after 'a.' that might follow
-                    //if not all are found, addError
-                    Symbol lastMember =classScope.resolve_members(member_names);
-                    if(lastMember== null){
-                        errors.addError( member_names + " do not exist", member_names[0], node, scope);
-                    }else if(!(lastMember instanceof Variable)){
-                        errors.addError( lastMember.name + " not a Variable that can be assigned to", member_names[member_names.length -1], node, scope);
+                    Scope classScope = (Scope) instance.getType();
+                    if (classScope == null) {
+                        errors.addError(member_names + " has no Scope", member_names[0], node, scope);
+                    } else {
+                        //find e (or all members after 'a.' that might follow
+                        //if not all are found, addError
+                        Symbol lastMember = classScope.resolve_members(member_names);
+                        if (lastMember == null) {
+                            errors.addError(member_names + " do not exist", member_names[0], node, scope);
+                        } else if (!(lastMember instanceof Variable)) {
+                            errors.addError(lastMember.name + " not a Variable that can be assigned to", member_names[member_names.length - 1], node, scope);
+                        }
                     }
                 }
 
@@ -228,11 +233,15 @@ public class SymboltableListener {
                 errors.addError(instance_name + " doesn't exist", instance_name, node, scope);
             } else {
                 Scope classScope = (Scope)instance.getType();
-                Symbol lastMember =classScope.resolve_members(member_names);
-                if(lastMember== null){
-                    errors.addError( member_names + " do not exist", member_names[0], node, scope);
-                }else if(lastMember instanceof Variable){
-                    errors.addError(lastMember.name + " is not a function", lastMember.name, node, scope);
+                if(classScope == null){
+                    errors.addError( member_names + " has no Scope", member_names[0], node, scope);
+                }else {
+                    Symbol lastMember = classScope.resolve_members(member_names);
+                    if (lastMember == null) {
+                        errors.addError(member_names + " do not exist", member_names[0], node, scope);
+                    } else if (lastMember instanceof Variable) {
+                        errors.addError(lastMember.name + " is not a function", lastMember.name, node, scope);
+                    }
                 }
             }
             //für Fälle wie a()
