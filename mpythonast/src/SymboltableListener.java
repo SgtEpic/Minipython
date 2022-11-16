@@ -1,7 +1,4 @@
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
-import java.util.Stack;
 
 public class SymboltableListener {
     //current Scope
@@ -10,19 +7,17 @@ public class SymboltableListener {
     static ErrorHandler errors = new ErrorHandler();
 
     public boolean walk(Node node) {
+        // walk through all the child nodes
         walk_node(node);
 
-        System.out.println();
-        System.out.println();
-        System.out.println();
-        System.out.println();
-
+        // print the current(global) scope
         scope.printChildren();
+
+        // if there are errors print them
         if (!errors.isEmpty()) {
             for (SymboltableErr error : errors.getErrorList()) {
                 System.err.println(error);
             }
-//            throw new RuntimeException("There were errors");
             return false;
         }
 
@@ -30,10 +25,13 @@ public class SymboltableListener {
     }
 
     public void walk_node(Node node) {
+        // call the enter function for this node
         enter(node);
+        // go through all the children
         for (Node child : node.children) {
             walk_node(child);
         }
+        // call the exit function for this node
         exit(node);
         //printTableOfScope();
     }
@@ -84,7 +82,61 @@ public class SymboltableListener {
         }
     }
 
-    //creates new Scope at the beginning; should bind all built-in functions
+    /**
+     * Deals with navigating e.g. a.b.c, and also checks for the usage of self
+     * @param isAssignment if true the last member is created and bound to the second-to-last-member's scope
+     * @param checkFunction if true it is checked if the last member is a function
+     */
+    private void navigateMembers(Node node, boolean isAssignment, boolean checkFunction) {
+        String node_name = node.name;
+        int index_point = node_name.indexOf(".");
+        String instance_name = node_name.substring(0, index_point);
+        Scope classScope = scope;
+        String[] member_names = splitMembers(node_name.substring(index_point + 1));
+        if (instance_name.equals("self")) {
+            classScope = findNextClassScope();
+
+        } else {
+            Symbol instance = scope.resolve(instance_name);
+            if (instance == null) {
+                errors.addError(instance_name + " doesn't exist", instance_name, node, scope);
+            } else {
+                if (instance.getType() == null) {
+                    errors.addError(memberArrayToString(member_names) + " has no Scope", member_names[0], node, scope);
+                } else {
+                    classScope = (Scope) instance.getType();
+                }
+            }
+        }
+
+        Symbol lastMember = classScope.resolve_members(member_names);
+        if (lastMember == null && !isAssignment) {
+            errors.addError(memberArrayToString(member_names) + " does not exist", member_names[0], node, scope);
+        }else if(isAssignment && lastMember == null){
+
+            String[] memberList = new String[member_names.length-1];
+            System.arraycopy(member_names, 0, memberList, 0, member_names.length - 1);
+            if(memberList.length != 0) {
+                Symbol bindingClass = classScope.resolve_members(memberList);
+                if(bindingClass.getType() != null) {
+                    ((Scope) bindingClass.getType()).bind(new Symbol(member_names[member_names.length - 1], bindingClass.getType()));
+                }
+                else{
+                    errors.addError(memberList[memberList.length-1] + " is not a Class", memberList[0], node, scope);
+                }
+            }else{
+                classScope.bind(new Symbol(member_names[member_names.length-1], classScope));
+            }
+        } else if(!isAssignment && checkFunction){
+            if(lastMember instanceof Variable) {
+                errors.addError(lastMember.name + " is not a function", lastMember.name, node, scope);
+            }
+        }
+    }
+
+    /**
+     * Program is always the first node in the AST. Sets up a global scope and binds all the built-ins
+     */
     private void enter_program_node(Program node) {
         scope = new Scope();
         scope.setName("global");
@@ -92,17 +144,23 @@ public class SymboltableListener {
         scope.bind(new BuiltIn("self"));
     }
 
-    //
+    /**
+     * Binds the newly defined function to its scope and creates a new scope for the function that the parameters
+     * will be bound to
+     */
     private void enter_fuction_definiton_node(FunctionDefinition node) {
         //gets name of the function
         Function func = new Function(node.children.get(0).name);
         scope.bind(func);
-        //scope.print();
-        //inside of the function body
+        //inside the function body
         scope = new Scope(scope);
         scope.setName("function " + func.name);
     }
 
+    /**
+     * Binds the newly defined class to its scope. Creates a new scope for the class that can contain a parent scope if
+     * the class is inheriting from another class
+     */
     private void enter_class_definition_node(ClassDefinition node) {
         //find the parent
         Symbol parent = scope.resolve(node.children.get(1).name);
@@ -115,9 +173,9 @@ public class SymboltableListener {
         //but since there is no multiple inheritance, we need to store the Scope in the type of the Symbol
         Scope classScope;
         if (parent != null) {
-            classScope = new Scope(scope, classSymbol, (Scope) parent.getType());
+            classScope = new Scope(scope, (Scope) parent.getType());
         } else {
-            classScope = new Scope(scope, classSymbol);
+            classScope = new Scope(scope);
         }
         //store scope in types
         classScope.setType(classScope);
@@ -128,13 +186,134 @@ public class SymboltableListener {
 
     }
 
-    //binds parameters of arglist, doppelt mit exit?
+    /**
+     * Binds parameters of the arguments to the function scope
+     */
     private void enter_arglist_node(ArgList node) {
         for (Node child : node.children) {
             if (!Objects.equals(child.name, "arg_list")) {
                 scope.bind(new Variable(child.name));
             }
         }
+    }
+
+    /**
+     * Checks if symbols on both sides of the assignment exist. Firstly the right side is checked.
+     * The classtype is the scope of the class that we instantiate.
+     * After that the left side is checked, where the symbol is bound to its scope. If the symbol already exists in that
+     * scope it doesn't get bound twice because the symbols are a HashMap
+     */
+    private void enter_assignment_node(AssignmentStatement node) {
+        Type classType = null;
+        // if the right side is a name of a symbol
+        if(node.children.get(1)instanceof NameNode){
+            // if there is a . in the name then we have to deal with instances and classes and stuff
+            if(node.children.get(1).name.contains(".")){
+                navigateMembers(node.children.get(1), false, false);
+            }else{
+                // here we just try to find the symbol
+                Symbol symbol = scope.resolve(node.children.get(1).name);
+                if(symbol == null){
+                    errors.addError(node.children.get(1).name + " not found", node.children.get(1).name, node, scope);
+                }
+            }
+        // if the right side is a function/constructor call
+        }else if(node.children.get(1) instanceof FunctionCall){
+            // if there is a . in the name then we have to deal with instances and classes and stuff
+            if(node.children.get(1).name.contains(".")){
+                navigateMembers(node.children.get(1), false, false);
+            }else{
+                // here we just try to find the symbol
+                Symbol symbol = scope.resolve(node.children.get(1).children.get(0).name);
+                // if we can't find the symbol we create an error
+                if(symbol == null){
+                    errors.addError(node.children.get(1).name + " not found", node.children.get(1).name, node, scope);
+                }else{
+                    // if we can find the symbol we want to save the type because it could be a class scope
+                    classType = symbol.getType();
+                }
+            }
+        }
+        // now onto the left side of the assignment
+        // if there is a . in the name then we have to deal with instances and classes and stuff
+        if(node.children.get(0).name.contains(".")){
+            navigateMembers(node.children.get(0), true, false);
+        }else{
+            // if the classtype is null we don't have a class instantiation, so it's a variable
+            if(classType == null){
+                Variable var = new Variable(node.children.get(0).name);
+                scope.bind(var);
+            }else {
+                // here the classtype is not null so the right side of the assigment was a constructor call,
+                // meaning that this symbol that we have to bind is an instance of that class
+                Symbol var = new Symbol(node.children.get(0).name, classType);
+                scope.bind(var);
+            }
+
+        }
+    }
+
+    /**
+     * Creates a new scope for the statement block except when the current scope is a class, to not have to scopes under
+     * a class and then the functions an attributes
+     */
+    private void enter_statement_node(StatementBlock node) {
+        // only when the scope belongs to a class is the type not null
+        if (scope.getType() == null) {
+            scope = new Scope(scope);
+            scope.setName("block");
+        }
+    }
+
+    /**
+     * Splits member names at the '.'
+     * @param members the string that contains all the members, e.g. "a.b.c"
+     * @return an array of all the members seperated, e.g. ["a", "b", "c"]
+     */
+    private String[] splitMembers(String members) {
+        return members.split("\\.", 0);
+    }
+
+    private void enter_function_call_node(FunctionCall node) {
+        String node_name = node.children.get(0).name;
+
+        //für Fälle wie a.b()
+        if (node_name.contains(".")) {
+            navigateMembers(node.children.get(0), false, true);
+        //für Fälle wie a()
+        } else {
+            Symbol func = scope.resolve(node.children.get(0).name);
+            if (func instanceof Variable) {
+                errors.addError(func.name + " is not a function", func.name, node, scope);
+            }
+        }
+    }
+
+    /**
+     * Checks that the symbols on both sides of a binary operator, e.g. +, -, <, exist
+     */
+    private void enter_binary_operator_node(BinaryOperator node) {
+        // check the left side first
+        // only check at all if the node is a name node, and not a number or string
+        // if there is a . in the name then we have to deal with instances and classes and stuff
+        if(node.children.get(0) instanceof NameNode && node.children.get(0).name.contains(".")){
+            navigateMembers(node.children.get(0), false, false);
+        // else if without a . , just a simple symbol
+        }else if(node.children.get(0) instanceof NameNode){
+            if(scope.resolve(node.children.get(0).name) == null){
+                errors.addError(node.children.get(0).name + " not found", node.children.get(0).name, node, scope);
+            }
+        }
+
+        // same checks for the right side as for the left side
+        if(node.children.get(1) instanceof NameNode && node.children.get(1).name.contains(".")){
+            navigateMembers(node.children.get(1), false, false);
+        }else if(node.children.get(1) instanceof NameNode){
+            if(scope.resolve(node.children.get(1).name) == null){
+                errors.addError(node.children.get(1).name + " not found", node.children.get(1).name, node, scope);
+            }
+        }
+
     }
 
     private void enter_return_node(ReturnStatement node) {
@@ -158,125 +337,6 @@ public class SymboltableListener {
     }
 
     private void enter_else_node(ElseStatement node) {
-
-    }
-
-    private void enter_assignment_node(AssignmentStatement node) {
-        Type classType = null;
-        if(!(node.children.get(1)instanceof BinaryOperator) && node.children.get(1)instanceof NameNode){
-            if(node.children.get(1).name.contains(".")){
-                navigateMembers(node.children.get(1), false);
-            }else{
-                Symbol symbol = scope.resolve(node.children.get(1).name);
-                if(symbol == null){
-
-                    errors.addError(node.children.get(1).name + " not found", node.children.get(1).name, node, scope);
-
-                }
-            }
-        }else if(node.children.get(1) instanceof FunctionCall){
-            if(node.children.get(1).name.contains(".")){
-                navigateMembers(node.children.get(1), false);
-            }else{
-                Symbol symbol = scope.resolve(node.children.get(1).children.get(0).name);
-
-                if(symbol == null){
-                    errors.addError(node.children.get(1).name + " not found", node.children.get(1).name, node, scope);
-
-                }else{
-                    classType = symbol.getType();
-                }
-            }
-        }
-
-
-        if(node.children.get(0).name.contains(".")){
-            navigateMembers(node.children.get(0), true);
-        }else{
-            if(classType == null){
-                Variable var = new Variable(node.children.get(0).name);
-                scope.bind(var);
-            }else {
-                Symbol var = new Symbol(node.children.get(0).name, classType);
-                scope.bind(var);
-            }
-
-        }
-    }
-
-
-    private void enter_statement_node(StatementBlock node) {
-        //we dont want the statement block, that lies between a class declaration and the statements, as a scope
-        if (scope.getType() == null) {
-            scope = new Scope(scope);
-            scope.setName("block");
-        }
-    }
-
-    private String[] splitMembers(String members) {
-        String split[] = members.split("\\.", 0);
-        return split;
-    }
-
-    //WIP
-    private void enter_function_call_node(FunctionCall node) {
-        String node_name = node.children.get(0).name;
-
-        //für Fälle wie a.b()
-        if (node_name.contains(".")) {
-            int index_point = node_name.indexOf(".");
-            String instance_name = node_name.substring(0, index_point);
-            Scope classScope = scope;
-            String[] member_names = splitMembers(node_name.substring(index_point + 1));
-            if (instance_name.equals("self")) {
-                classScope = findNextClassScope();
-
-            } else {
-                Symbol instance = scope.resolve(instance_name);
-                if (instance == null) {
-                    errors.addError(instance_name + " doesn't exist", instance_name, node, scope);
-                } else {
-                    classScope = (Scope) instance.getType();
-                    if (classScope == null) {
-                        errors.addError(member_names + " has no Scope", member_names[0], node, scope);
-                    }
-                }
-            }
-
-            Symbol lastMember = classScope.resolve_members(member_names);
-            if (lastMember == null) {
-                errors.addError(member_names + " do not exist", member_names[0], node, scope);
-            } else if (lastMember instanceof Variable) {
-                errors.addError(lastMember.name + " is not a function", lastMember.name, node, scope);
-            }
-
-
-            //für Fälle wie a()
-        } else {
-            Symbol func = scope.resolve(node.children.get(0).name);
-            if (func instanceof Variable) {
-                errors.addError(func.name + " is not a function", func.name, node, scope);
-//            throw new Exception(func.name + " is not a function");
-            }
-        }
-    }
-
-    private void enter_binary_operator_node(BinaryOperator node) {
-        if(node.children.get(0) instanceof NameNode && node.children.get(0).name.contains(".")){
-            navigateMembers(node.children.get(0), false);
-        }else if(node.children.get(0) instanceof NameNode){
-            if(scope.resolve(node.children.get(0).name) == null){
-                errors.addError(node.children.get(0).name + " not found", node.children.get(0).name, node, scope);
-            }
-        }
-
-        if(node.children.get(1) instanceof NameNode && node.children.get(1).name.contains(".")){
-            navigateMembers(node.children.get(1), false);
-        }else if(node.children.get(1) instanceof NameNode){
-            if(scope.resolve(node.children.get(1).name) == null){
-                errors.addError(node.children.get(1).name + " not found", node.children.get(1).name, node, scope);
-            }
-        }
 
     }
 
@@ -350,26 +410,79 @@ public class SymboltableListener {
         }
     }
 
-    private void exit_program_node(Program node) {
-
-    }
-
+    /**
+     * Go back to the scope above when the function definition is over
+     */
     private void exit_fuction_definiton_node(FunctionDefinition node) {
-        printTableOfScope();
         scope = scope.getEnclosingScope();
     }
 
+    /**
+     * Go back to the scope above when the class definition is over
+     */
     private void exit_class_definition_node(ClassDefinition node) {
-        printTableOfScope();
         scope = scope.getEnclosingScope();
     }
 
     private void exit_arglist_node(ArgList node) {
-        for (Node child : node.children) {
-            if (!Objects.equals(child.name, "arg_list")) {
-                scope.bind(new Variable(child.name));
+//        for (Node child : node.children) {
+//            if (!Objects.equals(child.name, "arg_list")) {
+//                scope.bind(new Variable(child.name));
+//            }
+//        }
+    }
+
+    /**
+     * Goes back to the scope above except when the current scope is a class. We didn't create a new scope for a block
+     * under a class, so we shouldn't go back to an enclosing scope
+     */
+    private void exit_statement_node(StatementBlock node) {
+        if (scope.getType() == null) {
+            //printTableOfScope();
+            scope = scope.getEnclosingScope();
+        }
+    }
+
+    private String memberArrayToString(String[] members){
+        StringBuilder output = new StringBuilder();
+        for(String member: members){
+            output.append(member).append(".");
+        }
+        output.deleteCharAt(output.length()-1);
+        return output.toString();
+    }
+
+
+    /**
+     * Finds an enclosing scope belonging to a class if such a scope exists, if not the current scope is returned
+     * @return a scope, eiter the class or the current scope
+     */
+    private Scope findNextClassScope() {
+        Scope currentScope = scope;
+        while (currentScope != null && currentScope.getType() == null) {
+            currentScope = currentScope.getEnclosingScope();
+        }
+        if (currentScope == null) {
+            return scope;
+        }
+        return currentScope;
+    }
+
+    /**
+     * Checks if the name that we want to access exists
+     */
+    private void exit_name_node(NameNode node) {
+        if (node.name.contains(".")) {
+            navigateMembers(node, false, false);
+        } else {
+            if (scope.resolve(node.name) == null) {
+                errors.addError("Could not find symbol: " + node.name, node.name, node, scope);
             }
         }
+    }
+
+    private void exit_program_node(Program node) {
+
     }
 
     private void exit_return_node(ReturnStatement node) {
@@ -400,14 +513,6 @@ public class SymboltableListener {
 
     }
 
-    private void exit_statement_node(StatementBlock node) {
-
-        if (scope.getType() == null) {
-            //printTableOfScope();
-            scope = scope.getEnclosingScope();
-        }
-    }
-
     private void exit_function_call_node(FunctionCall node) {
 
     }
@@ -425,76 +530,6 @@ public class SymboltableListener {
     }
 
 
-    private void navigateMembers(Node node, boolean isAssignment) {
-
-        String node_name = node.name;
-        int index_point = node_name.indexOf(".");
-        String instance_name = node_name.substring(0, index_point);
-        Scope classScope = scope;
-        String[] member_names = splitMembers(node_name.substring(index_point + 1));
-        if (instance_name.equals("self")) {
-            classScope = findNextClassScope();
-            //classScope.print();
-
-        } else {
-            Symbol instance = scope.resolve(instance_name);
-            if (instance == null) {
-                errors.addError(instance_name + " doesn't exist", instance_name, node, scope);
-            } else {
-                classScope = (Scope) instance.getType();
-                if (classScope == null) {
-                    errors.addError(member_names + " has no Scope", member_names[0], node, scope);
-                }
-            }
-        }
-
-        Symbol lastMember = classScope.resolve_members(member_names);
-        if (lastMember == null && !isAssignment) {
-            errors.addError(member_names + " do not exist", member_names[0], node, scope);
-        }else if(isAssignment && lastMember == null){
-
-            String[] memberList = new String[member_names.length-1];
-            for(int i =0; i< member_names.length-1; i++){
-                memberList[i] = member_names[i];
-            }
-            if(memberList.length != 0) {
-                Symbol bindingClass = classScope.resolve_members(memberList);
-                if(bindingClass.getType() != null) {
-                    ((Scope) bindingClass.getType()).bind(new Symbol(member_names[member_names.length - 1], bindingClass.getType()));
-                }
-                else{
-                    errors.addError(memberList[memberList.length-1] + " is not a Class", memberList[0], node, scope);
-                }
-            }else{
-                classScope.bind(new Symbol(member_names[member_names.length-1], classScope));
-            }
-        }
-    }
-
-    private Scope findNextClassScope() {
-        Scope currentScope = scope;
-        while (currentScope != null && currentScope.getType() == null) {
-            currentScope = currentScope.getEnclosingScope();
-        }
-        if (currentScope == null) {
-            return scope;
-        }
-        return currentScope;
-    }
-
-    private void exit_name_node(NameNode node) {
-        //a.e should not be checked
-        if (!node.name.contains(".")) {
-            if (scope.resolve(node.name) == null) {
-                errors.addError("Could not find symbol: " + node.name, node.name, node, scope);
-//            throw new Exception("Could not find symbol: " + node.name);
-            }
-        } else {
-            navigateMembers(node, false);
-        }
-
-    }
-
     private void exit_string_node(StringNode node) {
 
     }
@@ -505,10 +540,5 @@ public class SymboltableListener {
 
     private void exit_zero_node(ZeroNode node) {
 
-    }
-
-    private void printTableOfScope() {
-//        System.out.println("SCOOOOOPE");
-//        scope.print();
     }
 }

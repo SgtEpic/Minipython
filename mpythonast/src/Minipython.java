@@ -4,7 +4,7 @@ import org.antlr.v4.runtime.*;
 public class Minipython {
     public static void main(String[] args) throws Exception {
         // create a CharStream that reads from standard input
-        minipythonLexer lexer = new minipythonLexer(CharStreams.fromFileName("program.txt"));
+        minipythonLexer lexer = new minipythonLexer(CharStreams.fromFileName("../program.txt"));
 
         // create a buffer of tokens pulled from the lexer
         CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -24,7 +24,9 @@ public class Minipython {
         astVisitorPrinter.visit(ast);
 
         SymboltableListener listener = new SymboltableListener();
-        listener.walk(ast);
+        if(!listener.walk(ast)){
+            return;
+        }
 
         System.out.println(cst.toStringTree(parser)); // print LISP-style tree
 

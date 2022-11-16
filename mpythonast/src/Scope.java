@@ -2,25 +2,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Scope implements Type{
-    private HashMap<String,Symbol> symbols;
+    private final HashMap<String,Symbol> symbols;
 
-    private ArrayList<Scope> children = new ArrayList<>();
+    private final ArrayList<Scope> children = new ArrayList<>();
     private String name;
-
-    private Scope enclosingScope;
-
-    private Symbol functionSymbol;
-    //private Node functionNode
+    private final Scope enclosingScope;
 
     private final int depth;
 
-
-
-    private Clazz clazz = null;
-
     //ClassLogic
     private Type type;
-    private Symbol classSymbol;
     private Scope parentClass;
 
 
@@ -28,64 +19,25 @@ public class Scope implements Type{
         this.symbols = new HashMap<>();
         this.enclosingScope = null;
         this.depth = 0;
-        if(enclosingScope != null){
-            enclosingScope.children.add(this);
-        }
     }
-
-    public Scope(Scope enclosingScope, Clazz clazz){
-        symbols = new HashMap<>();
-        this.enclosingScope = enclosingScope;
-        this.depth = enclosingScope.depth + 1;
-        this.clazz = clazz;
-    }
-
 
     public Scope(Scope enclosingScope){
         symbols = new HashMap<>();
         this.enclosingScope = enclosingScope;
         this.depth = enclosingScope.depth + 1;
-        if(enclosingScope != null){
-            enclosingScope.children.add(this);
-        }
+        enclosingScope.children.add(this);
     }
 
-
-    public Scope(Scope enclosingScope, Symbol classSymbol){
+    public Scope(Scope enclosingScope, Scope parentClass){
         symbols = new HashMap<>();
         this.enclosingScope = enclosingScope;
-        this.depth = enclosingScope.depth + 1;
-        this.classSymbol = classSymbol;
-        if(enclosingScope != null){
-            enclosingScope.children.add(this);
-        }
-    }
-    public Scope(Scope enclosingScope, Symbol classSymbol, Scope parentClass){
-        symbols = new HashMap<>();
-        this.enclosingScope = enclosingScope;
-        this.classSymbol = classSymbol;
         this.parentClass = parentClass;
         this.depth = enclosingScope.depth + 1;
-        if(enclosingScope != null){
-            enclosingScope.children.add(this);
-        }
+        enclosingScope.children.add(this);
     }
-
-
-
-
-
-
-    public Scope(Scope enclosingScope, HashMap<String,Symbol> symbols){
-        this.symbols = new HashMap<>(symbols);
-        this.enclosingScope = enclosingScope;
-        this.depth = enclosingScope.depth + 1;
-    }
-
 
     public void bind(Symbol symbol){
         symbols.put(symbol.getName(), symbol);
-//        symbol.setScope(this);
     }
 
     public Symbol resolve(String name){
@@ -136,7 +88,6 @@ public class Scope implements Type{
             return null;
         }
 
-
         return resolve_member(names, 0);
     }
 
@@ -150,18 +101,6 @@ public class Scope implements Type{
 
     public Scope getEnclosingScope() {
         return enclosingScope;
-    }
-
-    public void setEnclosingScope(Scope enclosingScope) {
-        this.enclosingScope = enclosingScope;
-    }
-
-    public Symbol getFunctionSymbol() {
-        return functionSymbol;
-    }
-
-    public void setFunctionSymbol(Symbol functionSymbol) {
-        this.functionSymbol = functionSymbol;
     }
 
     public Type getType() {
@@ -178,14 +117,6 @@ public class Scope implements Type{
             System.out.println(this.depth + ": " + key);
         }
         System.out.println("");
-    }
-
-    public int getDepth(){
-        return this.depth;
-    }
-
-    public Symbol getClazz(){
-        return this.clazz;
     }
 
     public String getName() {

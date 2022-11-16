@@ -1,35 +1,44 @@
-a= 2
-if a == 2:
-    print("a is ", a)
-#end
-
-if a == 2:
-print("a is ", a)
-elif a == 3:
-print("a is ", a)
-else:
-print("a is neither 2 and 3")
-#end
-
-x = 3
-y = a+x
-while(x>y):
-    print(x ,"is bigger than ",y)
-    x=x-1
-#end
-
-def foo():
-print("ich bin eine Funktion")
-#end
-
 class A:
-def foo(self):
-    print("Ich bin eine Methode von A")
-#end
+d = 5
+    def r(b,c):
+        print("a")
+    #end
+    class B(A):
+        c = 5
+        def func():
+            f=1
+        #end
+        thus = r(5,6)
+        andsoon = t(5,6)
+    #end
+
+    b = B()
+
 #end
 
-class B(A): #Vererbung B erbt von A
-def foo(self):
-    print("Ich bin eine Methode von B")
+a= A()
+rewq = T()
+
+a.b.func() #check calling function
+a.b.func() = 3 #check assigning function
+a.b.func = 3 #check assigning function that isnt properly called
+
+a.d.c = 3 #check calling member of variable
+
+hi = 5
+jo()
+
+class C(A):
 #end
+
+z = hi()
+
+a.d = 3 # assigning variable
+a.r() #calling function as function
+
+a.d()  #calling variable as function
+
+def test(b,c):
+    print("a")
 #end
+test(1,2)
