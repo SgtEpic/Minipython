@@ -424,14 +424,6 @@ public class SymboltableListener {
         scope = scope.getEnclosingScope();
     }
 
-    private void exit_arglist_node(ArgList node) {
-//        for (Node child : node.children) {
-//            if (!Objects.equals(child.name, "arg_list")) {
-//                scope.bind(new Variable(child.name));
-//            }
-//        }
-    }
-
     /**
      * Goes back to the scope above except when the current scope is a class. We didn't create a new scope for a block
      * under a class, so we shouldn't go back to an enclosing scope
@@ -479,6 +471,10 @@ public class SymboltableListener {
                 errors.addError("Could not find symbol: " + node.name, node.name, node, scope);
             }
         }
+    }
+
+    private void exit_arglist_node(ArgList node) {
+
     }
 
     private void exit_program_node(Program node) {
