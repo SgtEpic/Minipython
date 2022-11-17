@@ -112,9 +112,12 @@ public class Scope implements Type{
     }
 
     public void print() {
-        System.out.println(name);
+        System.out.println(name + ": " + depth);
         for (String key : symbols.keySet()) {
             System.out.println(this.depth + ": " + key);
+        }
+        if(symbols.isEmpty()){
+            System.out.println("No symbols here");
         }
         System.out.println("");
     }

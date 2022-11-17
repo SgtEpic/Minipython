@@ -141,7 +141,7 @@ public class SymboltableListener {
         scope = new Scope();
         scope.setName("global");
         scope.bind(new BuiltIn("print"));
-        scope.bind(new BuiltIn("self"));
+        //scope.bind(new BuiltIn("self"));
     }
 
     /**
@@ -249,7 +249,6 @@ public class SymboltableListener {
                 Symbol var = new Symbol(node.children.get(0).name, classType);
                 scope.bind(var);
             }
-
         }
     }
 

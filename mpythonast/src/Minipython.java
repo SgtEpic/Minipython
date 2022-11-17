@@ -1,5 +1,10 @@
+import org.antlr.v4.gui.TreeViewer;
 import org.antlr.v4.runtime.tree.*;
 import org.antlr.v4.runtime.*;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.Arrays;
 
 public class Minipython {
     public static void main(String[] args) throws Exception {
@@ -29,6 +34,17 @@ public class Minipython {
         }
 
         System.out.println(cst.toStringTree(parser)); // print LISP-style tree
+
+        JFrame frame = new JFrame("Antlr AST");
+        JPanel panel = new JPanel();
+        TreeViewer viewer = new TreeViewer(Arrays.asList(
+                parser.getRuleNames()),ast);
+        viewer.setScale(1.5); // Scale a little
+        panel.add(viewer);
+        frame.add(panel);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.pack();
+        frame.setVisible(true);
 
 
 
