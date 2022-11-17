@@ -1,2 +1,2 @@
 mvn install
-mvn exec:java -Dexec.mainClass=org.compilerbau.minipython.Minipython
+mvn exec:java -Dexec.mainClass=org.compilerbau.minipython.main.Minipython

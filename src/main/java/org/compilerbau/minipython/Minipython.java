@@ -14,7 +14,7 @@ import org.antlr.v4.runtime.tree.*;
 public class Minipython {
     public static void main(String[] args) throws Exception {
         // create a CharStream that reads from standard input
-        //minipythonLexer lexer = new minipythonLexer(CharStreams.fromStream(System.in));
+        //main.minipythonLexer lexer = new main.minipythonLexer(CharStreams.fromStream(System.in));
         minipythonLexer lexer = new minipythonLexer(CharStreams.fromFileName("program.txt"));
 
         // create a buffer of tokens pulled from the lexer
