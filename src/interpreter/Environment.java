@@ -14,6 +14,8 @@ public class Environment {
     HashMap<String, Value> values = new HashMap<>();
     Scope scope;
 
+    int childrenAccessCounter = 0;
+
     private final ArrayList<Environment> children = new ArrayList<>();
 
     public Environment(Scope scope, Environment env) {
@@ -99,6 +101,12 @@ public class Environment {
         for(Environment child: children){
             child.printChildren();
         }
+    }
+
+    public Environment getChildEnvironment(){
+        Environment env = this.children.get(childrenAccessCounter);
+        childrenAccessCounter++;
+        return env;
     }
 
     private Environment getBaseEnvironmentFromScope() {

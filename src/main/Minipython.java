@@ -3,7 +3,9 @@ package main;
 import ast.AstVisitorPrinter;
 import ast.Node;
 import ast.Visitor;
+import interpreter.Environment;
 import interpreter.EnvironmentBuilder;
+import interpreter.Interpreter;
 import org.antlr.v4.gui.TreeViewer;
 import org.antlr.v4.runtime.tree.*;
 import org.antlr.v4.runtime.*;
@@ -43,7 +45,13 @@ public class Minipython {
         }
 
         EnvironmentBuilder environmentBuilder = new EnvironmentBuilder(symbolTable);
-        environmentBuilder.build().printChildren();
+        Environment env = environmentBuilder.build();
+        env.printChildren();
+
+        System.out.println("------------------------------------------------------------");
+
+        Interpreter interpreter = new Interpreter(env);
+        interpreter.visit(ast);
 
         System.out.println(cst.toStringTree(parser)); // print LISP-style tree
 

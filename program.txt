@@ -1,5 +1,60 @@
+a = 5
+a = 2 + 3
+print(a)
+
+a = 10 - 5
+a = "foo"
+b = 3
+var1 = "Hi"
+
+def func1(a, b):
+    c = a + b
+    return c == a + b
+#end
+
+def func2(c, d):
+	print(c + d)
+#end
+
+func1(a, b)
+
+func1(var1, 5)
+func1(func2(), 1 + 1)
+
+1 == 1
+7 >= 1 + 2
+
+a = 10
+while (a >= 0):
+    print(a)
+    a = a- 1
+#end
+
+a = "abc"
+if a < "adc":
+    print("a kleiner als ", "adc")
+elif a == "adf":
+    print("a ist ", "adf")
+else:
+    print("a passt nicht")
+#end
+
 class A:
-    def foo():
-        print("hi")
+    def method_1(self):
+        
     #end
 #end
+
+class B(A):
+    def setA(self, a):
+        self.a = a
+    #end
+
+    def getA(self):
+        return self.a
+    #end
+#end
+
+a = B()
+a.setA(5)
+
