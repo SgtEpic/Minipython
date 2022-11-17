@@ -16,7 +16,7 @@ import java.util.Arrays;
 public class Minipython {
     public static void main(String[] args) throws Exception {
         // create a CharStream that reads from standard input
-        minipythonLexer lexer = new minipythonLexer(CharStreams.fromFileName("mpythonast/program.txt"));
+        minipythonLexer lexer = new minipythonLexer(CharStreams.fromFileName("program.txt"));
 
         // create a buffer of tokens pulled from the lexer
         CommonTokenStream tokens = new CommonTokenStream(lexer);

@@ -1,1 +1,5 @@
-a = 5
+class A:
+    def foo():
+        print("hi")
+    #end
+#end
