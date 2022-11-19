@@ -262,7 +262,12 @@ public class SymboltableListener {
      */
     private void enter_statement_node(StatementBlock node) {
         // only when the scope belongs to a class is the type not null
-        if (scope.getType() == null) {
+        if (scope.getType() == null
+                && !(node.parent instanceof BranchStatement)
+                && !(node.parent instanceof IfStatement)
+                && !(node.parent instanceof ElifStatement)
+                && !(node.parent instanceof ElseStatement)
+                && !(node.parent instanceof WhileStatement)) {
             scope = new Scope(scope);
             scope.setName("block");
         }
@@ -432,7 +437,12 @@ public class SymboltableListener {
      * under a class, so we shouldn't go back to an enclosing scope
      */
     private void exit_statement_node(StatementBlock node) {
-        if (scope.getType() == null) {
+        if (scope.getType() == null
+                && !(node.parent instanceof BranchStatement)
+                && !(node.parent instanceof IfStatement)
+                && !(node.parent instanceof ElifStatement)
+                && !(node.parent instanceof ElseStatement)
+                && !(node.parent instanceof WhileStatement)) {
             //printTableOfScope();
             scope = scope.getEnclosingScope();
         }

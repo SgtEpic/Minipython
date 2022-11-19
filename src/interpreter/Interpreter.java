@@ -59,42 +59,59 @@ public class Interpreter extends minipythonAstVisitor<Value> {
 
     @Override
     public Value visit(WhileStatement node) {
-        for(Node child: node.children){
-            visit(child);
+
+//        for(Node child: node.children){
+//            visit(child);
+//        }
+        Value condition = visit(node.children.get(0));
+        while((Boolean)condition.getValue()){
+            visit(node.children.get(1));
+            condition = visit(node.children.get(0));
         }
         return null;
     }
 
     @Override
     public Value visit(BranchStatement node) {
-        for(Node child: node.children){
-            visit(child);
+        Value condition = visit(node.children.get(0));
+        for(int i = 1; i < node.children.size() ; i++){
+            if(!(Boolean)condition.getValue()){
+                condition = visit(node.children.get(i));
+            }else{
+                break;
+            }
+
         }
+
         return null;
     }
 
     @Override
     public Value visit(IfStatement node) {
-        for(Node child: node.children){
-            visit(child);
+        Value condition = visit(node.children.get(0));
+        if((Boolean)condition.getValue()){
+            visit(node.children.get(1));
+            return new Value(Type.BOOL, env, true);
+        }else {
+            return new Value(Type.BOOL, env, false);
         }
-        return null;
     }
 
     @Override
     public Value visit(ElifStatement node) {
-        for(Node child: node.children){
-            visit(child);
+        Value condition = visit(node.children.get(0));
+        if((Boolean)condition.getValue()){
+            visit(node.children.get(1));
+            return new Value(Type.BOOL, env, true);
+        }else {
+            return new Value(Type.BOOL, env, false);
         }
-        return null;
     }
 
     @Override
     public Value visit(ElseStatement node) {
-        for(Node child: node.children){
-            visit(child);
-        }
-        return null;
+        visit(node.children.get(0));
+        return new Value(Type.BOOL, env, true);
     }
 
     @Override
@@ -105,6 +122,9 @@ public class Interpreter extends minipythonAstVisitor<Value> {
 
         String symbolName = node.children.get(0).name;
         Value rightChild = (Value)visit(node.children.get(1));
+        if(rightChild == null){
+            throw new RuntimeException(node.children.get(1).name +" is not defined at " + node.position);
+        }
         env.assign(symbolName, rightChild);
         return null;
     }
@@ -112,7 +132,12 @@ public class Interpreter extends minipythonAstVisitor<Value> {
     @Override
     public Value visit(StatementBlock node) {
         Environment prev = null;
-        if(env.scope.getType() == null){
+        if(env.scope.getType() == null
+                && !(node.parent instanceof BranchStatement)
+                && !(node.parent instanceof IfStatement)
+                && !(node.parent instanceof ElifStatement)
+                && !(node.parent instanceof ElseStatement)
+                && !(node.parent instanceof WhileStatement)){
             prev = env;
             env = env.getChildEnvironment();
         }
@@ -139,6 +164,9 @@ public class Interpreter extends minipythonAstVisitor<Value> {
 
         Value left =visit(node.children.get(0));
         Value right = visit(node.children.get(1));
+        if(left == null || right == null){
+            throw new RuntimeException("variable not defined at " + node.position);
+        }
 
         switch(node.name){
             case "+":

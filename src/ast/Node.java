@@ -15,9 +15,11 @@ public class Node implements Tree {
         this.position = position;
     }
 
+    public Node parent;
+
     @Override
-    public Tree getParent() {
-        return null;
+    public Node getParent() {
+        return parent;
     }
 
     @Override

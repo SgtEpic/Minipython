@@ -9,6 +9,7 @@ public class Visitor extends minipythonBaseVisitor<Node> {
             for (minipythonParser.StmtContext stmt : ctx.stmt()) {
                 n.children.add(visit(stmt));
             }
+            addParentToChildren(n);
             return n;
      }
 
@@ -20,6 +21,7 @@ public class Visitor extends minipythonBaseVisitor<Node> {
             n.children.add(name);
             n.children.add(arg_list);
             n.children.add(stmt_block);
+         addParentToChildren(n);
             return n;
      }
 
@@ -34,6 +36,7 @@ public class Visitor extends minipythonBaseVisitor<Node> {
              }
             Node stmt_block = visit(ctx.stmt_block());
             n.children.add(stmt_block);
+         addParentToChildren(n);
             return n;
      }
 
@@ -41,6 +44,7 @@ public class Visitor extends minipythonBaseVisitor<Node> {
     public Node visitReturn_stmt(minipythonParser.Return_stmtContext ctx) {
          Node n = new ReturnStatement(new Position(ctx.start.getLine(), ctx.start.getCharPositionInLine()));
          n.children.add(visit(ctx.expr()));
+        addParentToChildren(n);
          return n;
     }
 
@@ -49,6 +53,7 @@ public class Visitor extends minipythonBaseVisitor<Node> {
          Node n = new WhileStatement(new Position(ctx.start.getLine(), ctx.start.getCharPositionInLine()));
          n.children.add(visit(ctx.expr()));
          n.children.add(visit(ctx.stmt_block()));
+        addParentToChildren(n);
          return n;
     }
 
@@ -62,6 +67,7 @@ public class Visitor extends minipythonBaseVisitor<Node> {
          if (ctx.else_stmt() != null) {
              n.children.add(visit(ctx.else_stmt()));
          }
+        addParentToChildren(n);
          return n;
     }
 
@@ -70,6 +76,7 @@ public class Visitor extends minipythonBaseVisitor<Node> {
          Node n = new IfStatement(new Position(ctx.start.getLine(), ctx.start.getCharPositionInLine()));
          n.children.add(visit(ctx.expr()));
          n.children.add(visit(ctx.stmt_block()));
+        addParentToChildren(n);
          return n;
     }
 
@@ -78,12 +85,14 @@ public class Visitor extends minipythonBaseVisitor<Node> {
         Node n = new ElifStatement(new Position(ctx.start.getLine(), ctx.start.getCharPositionInLine()));
         n.children.add(visit(ctx.expr()));
         n.children.add(visit(ctx.stmt_block()));
+        addParentToChildren(n);
         return n;
     }
     @Override
     public Node visitElse_stmt(minipythonParser.Else_stmtContext ctx) {
         Node n = new ElseStatement(new Position(ctx.start.getLine(), ctx.start.getCharPositionInLine()));
         n.children.add(visit(ctx.stmt_block()));
+        addParentToChildren(n);
         return n;
     }
 
@@ -93,6 +102,7 @@ public class Visitor extends minipythonBaseVisitor<Node> {
         for (minipythonParser.StmtContext stmt : ctx.stmt()) {
             n.children.add(visit(stmt));
         }
+        addParentToChildren(n);
         return n;
     }
 
@@ -102,6 +112,7 @@ public class Visitor extends minipythonBaseVisitor<Node> {
                 Node name = new NameNode(new Position(ctx.start.getLine(), ctx.start.getCharPositionInLine()), ctx.NAME(i).getText());
                 n.children.add(name);
             }
+        addParentToChildren(n);
             return n;
      }
 
@@ -121,6 +132,7 @@ public class Visitor extends minipythonBaseVisitor<Node> {
            }
            n.children.add(name);
            n.children.add(visit(ctx.expr()));
+         addParentToChildren(n);
            return n;
      }
 
@@ -132,6 +144,7 @@ public class Visitor extends minipythonBaseVisitor<Node> {
             Node n = visit(ctx.plusminusop());
             n.children.add(new ZeroNode(new Position(ctx.start.getLine(), ctx.start.getCharPositionInLine())));
             n.children.add(visit(ctx.expr()));
+         addParentToChildren(n);
             return n;
      }
 
@@ -140,6 +153,7 @@ public class Visitor extends minipythonBaseVisitor<Node> {
         for (minipythonParser.ExprContext expr : ctx.expr()) {
             n.children.add(visit(expr));
         }
+        addParentToChildren(n);
         return n;
 
     }
@@ -149,6 +163,7 @@ public class Visitor extends minipythonBaseVisitor<Node> {
         for (minipythonParser.ExprContext expr : ctx.expr()) {
             n.children.add(visit(expr));
         }
+        addParentToChildren(n);
         return n;
     }
 
@@ -157,12 +172,14 @@ public class Visitor extends minipythonBaseVisitor<Node> {
         for (minipythonParser.ExprContext expr : ctx.expr()) {
             n.children.add(visit(expr));
         }
+        addParentToChildren(n);
         return n;
     }
 
     public Node visitNotopLabel(minipythonParser.NotopLabelContext ctx) {
         Node n = new NotNode(new Position(ctx.start.getLine(), ctx.start.getCharPositionInLine()));
         n.children.add(visit(ctx.expr()));
+        addParentToChildren(n);
         return n;
     }
 
@@ -172,6 +189,7 @@ public class Visitor extends minipythonBaseVisitor<Node> {
         for (minipythonParser.ExprContext expr : ctx.expr()) {
             n.children.add(visit(expr));
         }
+        addParentToChildren(n);
         return n;
     }
 
@@ -181,6 +199,7 @@ public class Visitor extends minipythonBaseVisitor<Node> {
         for (minipythonParser.ExprContext expr : ctx.expr()) {
             n.children.add(visit(expr));
         }
+        addParentToChildren(n);
         return n;
     }
     public Node visitCallLabel(minipythonParser.CallLabelContext ctx) {
@@ -200,6 +219,7 @@ public class Visitor extends minipythonBaseVisitor<Node> {
         for (minipythonParser.ExprContext expr : ctx.expr()) {
             n.children.add(visit(expr));
         }
+        addParentToChildren(n);
         return n;
     }
 
@@ -216,6 +236,7 @@ public class Visitor extends minipythonBaseVisitor<Node> {
         } else {
             n = new NameNode(new Position(ctx.start.getLine(), ctx.start.getCharPositionInLine()), ctx.NAME(0).getText());
         }
+        addParentToChildren(n);
         return n;
     }
 
@@ -262,5 +283,13 @@ public class Visitor extends minipythonBaseVisitor<Node> {
     }
     public Node visitBooleanLabel(minipythonParser.BooleanLabelContext ctx) {
         return new BooleanNode(new Position(ctx.start.getLine(), ctx.start.getCharPositionInLine()), ctx.BOOLEAN().toString());
+    }
+
+    private void addParentToChildren(Node parent) {
+        int size = parent.getChildCount();
+        for (int i = 0; i < size; i++) {
+            Node child = (Node) parent.getChild(i);
+            child.parent = parent;
+        }
     }
 }
