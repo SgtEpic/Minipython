@@ -6,4 +6,5 @@ public enum Type {
     BOOL,
     CLASS,
     FUNCTION,
+    INSTANCE
 }

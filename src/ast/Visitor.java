@@ -248,7 +248,7 @@ public class Visitor extends minipythonBaseVisitor<Node> {
         return new BinaryOperator(new Position(ctx.start.getLine(), ctx.start.getCharPositionInLine()), "!=");
      }
     public Node visitEqLabel(minipythonParser.EqLabelContext ctx) {
-        return new BinaryOperator(new Position(ctx.start.getLine(), ctx.start.getCharPositionInLine()), "!=");
+        return new BinaryOperator(new Position(ctx.start.getLine(), ctx.start.getCharPositionInLine()), "==");
      }
 
     public Node visitNumberLabel(minipythonParser.NumberLabelContext ctx) {

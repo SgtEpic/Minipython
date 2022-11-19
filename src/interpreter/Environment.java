@@ -33,6 +33,7 @@ public class Environment {
         values.put(name, value);
     }
     public void assign(String name, Value value) {
+        values.put(name, value);
 
     }
     public Value get(String name){
@@ -88,7 +89,13 @@ public class Environment {
     public void print() {
         System.out.println(name + ": " + depth);
         for (String key : values.keySet()) {
-            System.out.println(this.depth + ": " + key);
+            String s;
+            if(values.get(key)== null){
+                s = this.depth + ": " + key;
+            }else{
+                s =this.depth + ": " + key + " := " + values.get(key).getValue() + " [" + values.get(key).getType() + "]";
+            }
+            System.out.println(s);
         }
         if(values.isEmpty()){
             System.out.println("No symbols here");
