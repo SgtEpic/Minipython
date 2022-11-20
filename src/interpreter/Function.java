@@ -27,4 +27,10 @@ public class Function extends Value {
     public int getParamAmount(){
         return params.size();
     }
+
+    Function bind(Instance instance) {
+        Environment environment = new Environment(instance.getKlass().getEnvironment().getEnclosing());
+        environment.define("self", instance);
+        return new Function(Type.INSTANCE, environment, null);
+    }
 }

@@ -6,16 +6,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Environment {
-    private final String name;
-    private final int depth;
-    private final Environment baseEnclosing;
-    private final Environment enclosing;
-    private final HashMap<String, Value> values = new HashMap<>();
-    private final Scope scope;
+    private String name;
+    private int depth;
+    private Environment baseEnclosing;
+    private Environment enclosing;
+    private HashMap<String, Value> values = new HashMap<>();
+    private Scope scope;
 
     private int childrenAccessCounter = 0;
 
     private final ArrayList<Environment> children = new ArrayList<>();
+
+    public Environment(Environment enclosing){
+        this.enclosing = enclosing;
+    }
 
     public Environment(Scope scope, Environment env) {
         this.scope = scope;
@@ -131,5 +135,9 @@ public class Environment {
            env = env.enclosing;
        }
        return null;
+    }
+
+    public Environment getEnclosing() {
+        return enclosing;
     }
 }

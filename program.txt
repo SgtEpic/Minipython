@@ -1,19 +1,10 @@
-def a(b, c):
-    b = b + c
-    d = "hi"
-    return b
+class A:
+    def __init__(self):
+    #end
 #end
 
-print("Please enter a number between 1 and 2")
-c = input()
-a = 32
-b = 64
+a = A()
+a.foo();
 
-
-if c == "1":
-    print(a)
-elif c == "2":
-    print(b)
-else:
-    print("Out of range")
-#end
+global: 0
+0: a := function [Instance]

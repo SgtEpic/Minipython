@@ -2,6 +2,8 @@ package interpreter;
 
 import ast.*;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Interpreter extends minipythonAstVisitor<Value> {
@@ -62,6 +64,13 @@ public class Interpreter extends minipythonAstVisitor<Value> {
     public Value visit(FunctionCall node) {
         // get the function value
         Function func = (Function) env.get(node.children.get(0).name);
+
+        if (func.getType() == Type.CLASS) {
+            // if the function is a class, create a new instance of it
+            return ((Klass) func).call(this, null);
+        } else {
+
+        }
 
         if(func.getType() != Type.FUNCTION && func.getType() != Type.NATIVE_FUNCTION){
             throw new RuntimeException(node.children.get(0).name + " is not a function at: " + node.position);
@@ -134,13 +143,37 @@ public class Interpreter extends minipythonAstVisitor<Value> {
 
     @Override
     public Value visit(ClassDefinition node) {
-        Environment prev = env;
-        env = env.getChildEnvironment();
-        for(Node child: node.children){
-            visit(child);
+        Environment classEnv = env.getChildEnvironment();
+        Klass superclass = null;
+        int statementBlockIndex = 1;
+
+        if (node.children.get(1) instanceof NameNode) {
+            Value v = visit(node.children.get(1));
+            if (v == null) {
+                throw new RuntimeException("Superclass not found");
+            }
+            superclass = (Klass) visit(node.children.get(1)).getValue();
+            if (superclass.getType() != Type.CLASS) {
+                throw new RuntimeException("Superclass must be a class.");
+            }
+            statementBlockIndex++;
         }
-        env = prev;
-        return null;
+
+        HashMap<String, Function> methods = new HashMap<>();
+        Environment funcEnv = classEnv.getChildEnvironment();
+        for (Node child : node.children.get(statementBlockIndex).children) {
+            if (child instanceof FunctionDefinition) {
+                Function value = new Function(Type.FUNCTION, funcEnv, node);
+                for (int i = 0; i < child.children.size(); i++) {
+                    value.setParam(i, child.children.get(i).name);
+                }
+            }
+        }
+
+        Klass value = new Klass(classEnv, node, superclass, methods);
+        env.assign(node.children.get(0).name, value);
+
+        return value;
     }
 
     @Override
