@@ -41,4 +41,8 @@ public class Node implements Tree {
     public String toStringTree() {
         return null;
     }
+
+    public String toString(){
+        return name;
+    }
 }

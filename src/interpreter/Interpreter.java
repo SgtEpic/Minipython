@@ -2,6 +2,8 @@ package interpreter;
 
 import ast.*;
 
+import java.util.Scanner;
+
 public class Interpreter extends minipythonAstVisitor<Value> {
 
     Environment env;
@@ -12,22 +14,122 @@ public class Interpreter extends minipythonAstVisitor<Value> {
 
     @Override
     public Value visit(Program node) {
+        Function print = new Function(Type.NATIVE_FUNCTION, env, null);
+        print.setParam(0, "string");
+        env.assign("print", print);
+        env.assign("input", new Function(Type.NATIVE_FUNCTION, env, null));
         for(Node child: node.children){
             visit(child);
         }
+        System.out.println("------------------------------------------------------------");
         env.printChildren();
         return null;
     }
 
+    /**
+     * Creates a function value for a function. Does not execute the function itself
+     */
     @Override
     public Value visit(FunctionDefinition node) {
-        Environment prev = env;
-        env = env.getChildEnvironment();
-        for(Node child: node.children){
-            visit(child);
-        }
-        env = prev;
+        // get func environment to still be in the same order as the scopes
+        Environment func_env = env.getChildEnvironment();
+        // value is the node here to give the function call an entry point for execution
+        Function value = new Function(Type.FUNCTION, func_env, node);
+        env.assign(node.children.get(0).name, value);
+        // go to the argument list
+        visit(node.children.get(1));
+
         return null;
+    }
+
+    /**
+     * Save the name and position of the parameters to the function value.
+     * Needed in the function call to identify which argument belongs to which parameter
+     */
+    @Override
+    public Value visit(ArgList node) {
+        Function value = (Function) env.get(node.parent.children.get(0).name);
+        for(int i = 0; i < node.children.size(); i++){
+            value.setParam(i, node.children.get(i).name);
+        }
+        return null;
+    }
+
+    /**
+     * Calls the function with the specified name
+     */
+    @Override
+    public Value visit(FunctionCall node) {
+        // get the function value
+        Function func = (Function) env.get(node.children.get(0).name);
+
+        if(func.getType() != Type.FUNCTION && func.getType() != Type.NATIVE_FUNCTION){
+            throw new RuntimeException(node.children.get(0).name + " is not a function at: " + node.position);
+        }
+
+        // check if the amount of arguments is the same as the amount of parameters for the function
+        if(node.children.size()-1 != func.getParamAmount()){
+            throw new RuntimeException("argument amount not matching in " + node.children.get(0).name);
+        }
+
+        // if the function is a native function like print and input
+        if(func.getType() == Type.NATIVE_FUNCTION){
+            // put the arguments into an array
+            Value[] params = new Value[func.getParamAmount()];
+            for(int i = 1; i < node.children.size(); i++){
+                params[i-1] = visit(node.children.get(i));
+            }
+            // the return value is whatever the native functions return
+            return nativeFunctionCall(node.children.get(0).name, params);
+        }
+
+        // only here if it is not a native function
+        // get the node as an entry point for function execution
+        Node func_node = (Node)func.getValue();
+        // go into the function environment
+        Environment prev = env;
+        env = func.getEnvironment();
+
+        // set all the parameters to the values from the corresponding arguments
+        for(int i = 1; i < node.children.size(); i++){
+            String paramName = func.getParam(i-1);
+            env.assign(paramName, visit(node.children.get(i)));
+        }
+
+        // return value is done via an exception thrown in the return statement
+        // if there is not a return value to a function then the return value is null
+        Value returnValue = null;
+        try{
+            // visit the statement block of the function
+            visit(func_node.children.get(2));
+        } catch (ReturnException e){
+            returnValue = e.value;
+        }
+        // go back to the calling environment
+        env = prev;
+        return returnValue;
+    }
+
+    /**
+     * Throws an exception containing the return value that has to be caught in the function call
+     */
+    @Override
+    public Value visit(ReturnStatement node) {
+        Value value = visit(node.children.get(0));
+        throw new ReturnException(value);
+    }
+
+    private Value nativeFunctionCall(String funcName, Value[] params){
+        switch (funcName){
+            case "print":
+                System.out.println(params[0].getValue());
+                return null;
+            case "input":
+                Scanner scanner = new Scanner(System.in);
+                return new Value(Type.STRING, env, scanner.nextLine());
+            default:
+                return null;
+        }
     }
 
     @Override
@@ -42,27 +144,7 @@ public class Interpreter extends minipythonAstVisitor<Value> {
     }
 
     @Override
-    public Value visit(ArgList node) {
-        for(Node child: node.children){
-            visit(child);
-        }
-        return null;
-    }
-
-    @Override
-    public Value visit(ReturnStatement node) {
-        for(Node child: node.children){
-            visit(child);
-        }
-        return null;
-    }
-
-    @Override
     public Value visit(WhileStatement node) {
-
-//        for(Node child: node.children){
-//            visit(child);
-//        }
         Value condition = visit(node.children.get(0));
         while((Boolean)condition.getValue()){
             visit(node.children.get(1));
@@ -86,8 +168,7 @@ public class Interpreter extends minipythonAstVisitor<Value> {
         return null;
     }
 
-    @Override
-    public Value visit(IfStatement node) {
+    private Value ifElifVisit(Node node){
         Value condition = visit(node.children.get(0));
         if((Boolean)condition.getValue()){
             visit(node.children.get(1));
@@ -98,14 +179,13 @@ public class Interpreter extends minipythonAstVisitor<Value> {
     }
 
     @Override
+    public Value visit(IfStatement node) {
+        return ifElifVisit(node);
+    }
+
+    @Override
     public Value visit(ElifStatement node) {
-        Value condition = visit(node.children.get(0));
-        if((Boolean)condition.getValue()){
-            visit(node.children.get(1));
-            return new Value(Type.BOOL, env, true);
-        }else {
-            return new Value(Type.BOOL, env, false);
-        }
+        return ifElifVisit(node);
     }
 
     @Override
@@ -116,12 +196,8 @@ public class Interpreter extends minipythonAstVisitor<Value> {
 
     @Override
     public Value visit(AssignmentStatement node) {
-//        for(Node child: node.children){
-//            visit(child);
-//        }
-
         String symbolName = node.children.get(0).name;
-        Value rightChild = (Value)visit(node.children.get(1));
+        Value rightChild = visit(node.children.get(1));
         if(rightChild == null){
             throw new RuntimeException(node.children.get(1).name +" is not defined at " + node.position);
         }
@@ -132,7 +208,7 @@ public class Interpreter extends minipythonAstVisitor<Value> {
     @Override
     public Value visit(StatementBlock node) {
         Environment prev = null;
-        if(env.scope.getType() == null
+        if(env.getScope().getType() == null
                 && !(node.parent instanceof BranchStatement)
                 && !(node.parent instanceof IfStatement)
                 && !(node.parent instanceof ElifStatement)
@@ -152,20 +228,16 @@ public class Interpreter extends minipythonAstVisitor<Value> {
     }
 
     @Override
-    public Value visit(FunctionCall node) {
-        for(Node child: node.children){
-            visit(child);
-        }
-        return null;
-    }
-
-    @Override
     public Value visit(BinaryOperator node) {
 
         Value left =visit(node.children.get(0));
         Value right = visit(node.children.get(1));
-        if(left == null || right == null){
-            throw new RuntimeException("variable not defined at " + node.position);
+        if(left == null){
+            throw new RuntimeException(node.children.get(0) + " not defined at " + node.position);
+        }
+
+        if(right == null){
+            throw new RuntimeException(node.children.get(1) + " not defined at " + node.position);
         }
 
         switch(node.name){
@@ -173,7 +245,7 @@ public class Interpreter extends minipythonAstVisitor<Value> {
                 if(left.getType() == Type.INT && right.getType() == Type.INT){
                     return new Value(Type.INT, env,(Integer)left.getValue() + (Integer)right.getValue());
                 }else if(left.getType() == Type.STRING && right.getType() == Type.STRING) {
-                    return new Value(Type.STRING, env, (String) left.getValue() + (String) right.getValue());
+                    return new Value(Type.STRING, env, left.getValue() + (String) right.getValue());
                 }else{
                     throw new RuntimeException("cannot add the objects");
                 }
@@ -243,7 +315,7 @@ public class Interpreter extends minipythonAstVisitor<Value> {
     }
 
     private boolean parseBool(Value v){
-        boolean b = true;
+        boolean b;
         switch(v.getType()){
             case INT:
                 b = (Integer)v.getValue() != 0 ;
@@ -285,13 +357,12 @@ public class Interpreter extends minipythonAstVisitor<Value> {
 
     @Override
     public Value visit(StringNode node) {
-
         return new Value(Type.STRING, env, node.name.substring(1,node.name.length()-1));
     }
 
     @Override
     public Value visit(BooleanNode node) {
-        return new Value(Type.BOOL, env, new Boolean(node.name));
+        return new Value(Type.BOOL, env, Boolean.valueOf(node.name));
     }
 
     @Override

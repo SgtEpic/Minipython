@@ -1,7 +1,6 @@
 package interpreter;
 
 import symboltable.Scope;
-import symboltable.Symbol;
 
 public class EnvironmentBuilder {
     public Scope scope;

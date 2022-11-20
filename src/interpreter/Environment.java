@@ -1,20 +1,19 @@
 package interpreter;
 
 import symboltable.Scope;
-import symboltable.Symbol;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Environment {
-    String name;
-    private int depth;
-    Environment baseEnclosing;
-    Environment enclosing = null;
-    HashMap<String, Value> values = new HashMap<>();
-    Scope scope;
+    private final String name;
+    private final int depth;
+    private final Environment baseEnclosing;
+    private final Environment enclosing;
+    private final HashMap<String, Value> values = new HashMap<>();
+    private final Scope scope;
 
-    int childrenAccessCounter = 0;
+    private int childrenAccessCounter = 0;
 
     private final ArrayList<Environment> children = new ArrayList<>();
 
@@ -38,9 +37,12 @@ public class Environment {
     }
     public Value get(String name){
         if (values.containsKey(name)){
-            return values.get(name);
+            if(values.get(name) != null){
+                return values.get(name);
+            }
         }
-        else if(enclosing == null) {
+
+        if(enclosing == null) {
             return null;
         }
         return enclosing.get(name);
@@ -100,7 +102,7 @@ public class Environment {
         if(values.isEmpty()){
             System.out.println("No symbols here");
         }
-        System.out.println("");
+        System.out.println();
     }
 
     public void printChildren(){
@@ -114,6 +116,10 @@ public class Environment {
         Environment env = this.children.get(childrenAccessCounter);
         childrenAccessCounter++;
         return env;
+    }
+
+    public Scope getScope(){
+        return this.scope;
     }
 
     private Environment getBaseEnvironmentFromScope() {

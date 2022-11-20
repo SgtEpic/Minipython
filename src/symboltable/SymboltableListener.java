@@ -145,6 +145,7 @@ public class SymboltableListener {
         scope = new Scope();
         scope.setName("global");
         scope.bind(new BuiltIn("print"));
+        scope.bind(new BuiltIn("input"));
         //scope.bind(new symboltable.BuiltIn("self"));
     }
 

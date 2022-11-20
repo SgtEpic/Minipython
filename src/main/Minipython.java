@@ -46,25 +46,25 @@ public class Minipython {
 
         EnvironmentBuilder environmentBuilder = new EnvironmentBuilder(symbolTable);
         Environment env = environmentBuilder.build();
-        env.printChildren();
+//        env.printChildren();
 
-        System.out.println("------------------------------------------------------------");
+//        System.out.println("------------------------------------------------------------");
 
         Interpreter interpreter = new Interpreter(env);
         interpreter.visit(ast);
 
         System.out.println(cst.toStringTree(parser)); // print LISP-style tree
 
-      /*  JFrame frame = new JFrame("Antlr AST");
-        JPanel panel = new JPanel();
-        TreeViewer viewer = new TreeViewer(Arrays.asList(
-                parser.getRuleNames()),ast);
-        viewer.setScale(1.5); // Scale a little
-        panel.add(viewer);
-        frame.add(panel);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.pack();
-        frame.setVisible(true);*/
+//        JFrame frame = new JFrame("Antlr AST");
+//        JPanel panel = new JPanel();
+//        TreeViewer viewer = new TreeViewer(Arrays.asList(
+//                parser.getRuleNames()),ast);
+//        viewer.setScale(1.5); // Scale a little
+//        panel.add(viewer);
+//        frame.add(panel);
+//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//        frame.pack();
+//        frame.setVisible(true);
 
 
 

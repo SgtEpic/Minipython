@@ -1,10 +1,19 @@
-a = 3
-if a == 3:
-    b=1
-elif a == 4:
-    c=3
-else:
-    d = 9
-    #end
+def a(b, c):
+    b = b + c
+    d = "hi"
+    return b
+#end
 
-e = b
+print("Please enter a number between 1 and 2")
+c = input()
+a = 32
+b = 64
+
+
+if c == "1":
+    print(a)
+elif c == "2":
+    print(b)
+else:
+    print("Out of range")
+#end

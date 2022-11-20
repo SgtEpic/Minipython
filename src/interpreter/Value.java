@@ -1,15 +1,10 @@
 package interpreter;
 
 public class Value {
-    private Type type;
-    private Environment environment;
+    private final Type type;
+    private final Environment environment;
 
-    private Object value;
-
-    public Value(Type type, Environment environment) {
-        this.type = type;
-        this.environment = environment;
-    }
+    private final Object value;
 
     public Value(Type type, Environment environment, Object value) {
         this.type = type;
@@ -27,9 +22,5 @@ public class Value {
 
     public Object getValue() {
         return value;
-    }
-
-    public void setValue(Object value) {
-        this.value = value;
     }
 }
