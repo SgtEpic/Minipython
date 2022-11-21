@@ -1,5 +1,6 @@
 package interpreter;
 
+import ast.ClassDefinition;
 import symboltable.Scope;
 
 import java.util.ArrayList;
@@ -96,10 +97,16 @@ public class Environment {
         System.out.println(name + ": " + depth);
         for (String key : values.keySet()) {
             String s;
-            if(values.get(key)== null){
+            Value v = values.get(key);
+            if(v== null){
                 s = this.depth + ": " + key;
             }else{
-                s =this.depth + ": " + key + " := " + values.get(key).getValue() + " [" + values.get(key).getType() + "]";
+                if(v.getType() == Type.INSTANCE){
+
+                    s =this.depth + ": " + key + " := " + v + " [" + v.getType() + "]";
+                }else {
+                    s = this.depth + ": " + key + " := " + v.getValue() + " [" + v.getType() + "]";
+                }
             }
             System.out.println(s);
         }

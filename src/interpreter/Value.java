@@ -2,7 +2,7 @@ package interpreter;
 
 public class Value {
     private final Type type;
-    private final Environment environment;
+    protected final Environment environment;
 
     private final Object value;
 

@@ -1,6 +1,8 @@
 package interpreter;
 
+import java.util.List;
+
 public interface MPCallable {
     int arity();
-    Object call(Interpreter interpreter, Object[] arguments);
+    Value call(Interpreter interpreter, List<Value> arguments);
 }

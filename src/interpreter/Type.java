@@ -7,5 +7,6 @@ public enum Type {
     CLASS,
     FUNCTION,
     NATIVE_FUNCTION,
-    INSTANCE
+    INSTANCE,
+    CONSTRUCTOR
 }

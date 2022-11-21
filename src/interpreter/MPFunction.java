@@ -2,6 +2,8 @@ package interpreter;
 
 import ast.FunctionDefinition;
 
+import java.util.List;
+
 public class MPFunction implements MPCallable{
 
     private final FunctionDefinition definition;
@@ -28,7 +30,7 @@ public class MPFunction implements MPCallable{
     }
 
     @Override
-    public Object call(Interpreter interpreter, Object[] arguments) {
+    public Value call(Interpreter interpreter, List<Value> arguments) {
         return null;
     }
 }

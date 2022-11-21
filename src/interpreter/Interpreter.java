@@ -2,9 +2,7 @@ package interpreter;
 
 import ast.*;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 public class Interpreter extends minipythonAstVisitor<Value> {
 
@@ -33,10 +31,14 @@ public class Interpreter extends minipythonAstVisitor<Value> {
      */
     @Override
     public Value visit(FunctionDefinition node) {
-        // get func environment to still be in the same order as the scopes
-        Environment func_env = env.getChildEnvironment();
+        Function value = null;
+        String funcName = node.children.get(0).name;
         // value is the node here to give the function call an entry point for execution
-        Function value = new Function(Type.FUNCTION, func_env, node);
+        if(funcName.equals("__init__")){
+            value = new Function(Type.CONSTRUCTOR, env, node);
+        }else {
+            value = new Function(Type.FUNCTION, env, node);
+        }
         env.assign(node.children.get(0).name, value);
         // go to the argument list
         visit(node.children.get(1));
@@ -63,61 +65,57 @@ public class Interpreter extends minipythonAstVisitor<Value> {
     @Override
     public Value visit(FunctionCall node) {
         // get the function value
-        Function func = (Function) env.get(node.children.get(0).name);
 
-        if (func.getType() == Type.CLASS) {
-            // if the function is a class, create a new instance of it
-            return ((Klass) func).call(this, null);
-        } else {
+        Klass klass;
+        Value check = (Value) env.get(node.children.get(0).name);
 
+        List<Value> arguments = new ArrayList<>();
+        for(int i = 1; i < node.children.size(); i++){
+            //String paramName = func.getParam(i-1);
+            arguments.add((Value)visit(node.children.get(i)));
         }
 
-        if(func.getType() != Type.FUNCTION && func.getType() != Type.NATIVE_FUNCTION){
+
+//        if (func.getType() == Type.CLASS) {
+//            // if the function is a class, create a new instance of it
+//            return ((Klass) func).call(this, null);
+//        } else {
+//
+//        }
+
+        if(!(check instanceof MPCallable)){
             throw new RuntimeException(node.children.get(0).name + " is not a function at: " + node.position);
         }
 
-        // check if the amount of arguments is the same as the amount of parameters for the function
-        if(node.children.size()-1 != func.getParamAmount()){
-            throw new RuntimeException("argument amount not matching in " + node.children.get(0).name);
-        }
-
-        // if the function is a native function like print and input
-        if(func.getType() == Type.NATIVE_FUNCTION){
-            // put the arguments into an array
-            Value[] params = new Value[func.getParamAmount()];
-            for(int i = 1; i < node.children.size(); i++){
-                params[i-1] = visit(node.children.get(i));
+        MPCallable func = (MPCallable) check;
+            // check if the amount of arguments is the same as the amount of parameters for the function
+            if(node.children.size()-1 != func.arity()){
+                throw new RuntimeException("argument amount not matching in " + node.children.get(0).name);
             }
-            // the return value is whatever the native functions return
-            return nativeFunctionCall(node.children.get(0).name, params);
+
+            // if the function is a native function like print and input
+            if(check.getType() == Type.NATIVE_FUNCTION){
+//                // put the arguments into an array
+//                Value[] params = new Value[func.getParamAmount()];
+//                for(int i = 1; i < node.children.size(); i++){
+//                    params[i-1] = visit(node.children.get(i));
+//                }
+//                // the return value is whatever the native functions return
+//                return nativeFunctionCall(node.children.get(0).name, params);
+                return null;
+            }
+
+            //only here if func is not a native function
+        Value v = func.call(this, arguments);
+//            if(v.getType() == Type.INSTANCE){
+//                Instance inst = (Instance)v;
+//                inst.
+//            }
+
+        return v;
+
         }
 
-        // only here if it is not a native function
-        // get the node as an entry point for function execution
-        Node func_node = (Node)func.getValue();
-        // go into the function environment
-        Environment prev = env;
-        env = func.getEnvironment();
-
-        // set all the parameters to the values from the corresponding arguments
-        for(int i = 1; i < node.children.size(); i++){
-            String paramName = func.getParam(i-1);
-            env.assign(paramName, visit(node.children.get(i)));
-        }
-
-        // return value is done via an exception thrown in the return statement
-        // if there is not a return value to a function then the return value is null
-        Value returnValue = null;
-        try{
-            // visit the statement block of the function
-            visit(func_node.children.get(2));
-        } catch (ReturnException e){
-            returnValue = e.value;
-        }
-        // go back to the calling environment
-        env = prev;
-        return returnValue;
-    }
 
     /**
      * Throws an exception containing the return value that has to be caught in the function call
@@ -152,7 +150,7 @@ public class Interpreter extends minipythonAstVisitor<Value> {
             if (v == null) {
                 throw new RuntimeException("Superclass not found");
             }
-            superclass = (Klass) visit(node.children.get(1)).getValue();
+            superclass = (Klass)env.get(node.children.get(1).name);
             if (superclass.getType() != Type.CLASS) {
                 throw new RuntimeException("Superclass must be a class.");
             }
@@ -174,6 +172,7 @@ public class Interpreter extends minipythonAstVisitor<Value> {
         env.assign(node.children.get(0).name, value);
 
         return value;
+
     }
 
     @Override
@@ -234,8 +233,29 @@ public class Interpreter extends minipythonAstVisitor<Value> {
         if(rightChild == null){
             throw new RuntimeException(node.children.get(1).name +" is not defined at " + node.position);
         }
+        System.out.println(symbolName);
+
+
         env.assign(symbolName, rightChild);
+        Value leftChild = env.get(symbolName);
+        if(leftChild.getType() == Type.INSTANCE){
+
+        }
         return null;
+    }
+//https://github.com/munificent/craftinginterpreters/blob/master/java/com/craftinginterpreters/lox/
+    void executeBlock(Node node,
+                      Environment environment) {
+        Environment prev = this.env;
+        try {
+            this.env = environment;
+
+            for(Node child: node.children){
+                visit(child);
+            }
+        } finally {
+            this.env = prev;
+        }
     }
 
     @Override

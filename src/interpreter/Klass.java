@@ -2,6 +2,7 @@ package interpreter;
 
 import ast.Node;
 
+import java.util.List;
 import java.util.Map;
 
 public class Klass extends Value implements MPCallable {
@@ -10,11 +11,12 @@ public class Klass extends Value implements MPCallable {
     private Map<String, Function> methods;
 
     public Klass(Environment env, Node entryPoint, Klass superclass) {
-        super(Type.CLASS, env, env);
+        super(Type.CLASS, env, entryPoint);
         this.superclass = superclass;
+
     }
     public Klass(Environment env, Node entryPoint, Klass superclass, Map<String, Function> methods) {
-        super(Type.CLASS, env, env);
+        super(Type.CLASS, env, entryPoint);
         this.superclass = superclass;
         this.methods = methods;
     }
@@ -23,24 +25,22 @@ public class Klass extends Value implements MPCallable {
         if (methods.containsKey(name)) {
             return methods.get(name);
         }
-
         if (superclass != null) {
             return superclass.findMethod(name);
         }
-
         return null;
     }
 
     @Override
     public int arity() {
-    /*    MPFunction initializer = findMethod("__init__");
+        Function initializer = findMethod("__init__");
         if (initializer == null) return 0;
-        return initializer.arity();*/
-        return 0;
+        return initializer.arity()-1;
+
     }
 
     @Override
-    public Object call(Interpreter interpreter, Object[] arguments) {
+    public Value call(Interpreter interpreter, List<Value> arguments) {
         Instance instance = new Instance(this);
         Function initializer = findMethod("__init__");
 
@@ -48,7 +48,7 @@ public class Klass extends Value implements MPCallable {
             initializer.bind(instance).call(interpreter, arguments);
         }
         return instance;
-        return null;
+
     }
 
     @Override
