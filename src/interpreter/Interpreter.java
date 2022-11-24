@@ -149,7 +149,9 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
             }
             return null;
         } else {
-            execute(stmt.elseBranch);
+            if (stmt.elseBranch != null) {
+                execute(stmt.elseBranch);
+            }
         }
         return null;
 
@@ -326,6 +328,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
     @Override
     public Object visitVariableExpr(Expr.Variable expr) {
         return lookUpVariable(expr.symbol, expr);
+        //return environment.get(expr.symbol);
     }
 
     private Object lookUpVariable(Symbol symbol, Expr expr) {

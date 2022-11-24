@@ -282,16 +282,17 @@ public class Symboltable implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
         }
         System.out.println("\n\n");
     }
-
-    private void printScopeTable(String name) {
-        System.out.println("\n" + name + " Scope Table:");
-        for (int i = scopes.size() -1; i >= 0; i--) {
-            System.out.println("Scope " + i);
-            for (String key : scopes.get(i).keySet()) {
-                System.out.println(key + " :: " + scopes.get(i).get(key));
-            }
+    
+private void printScopeTable(String name) {
+    System.out.println("\n" + name + " Scope Table:");
+    if(scopes.size() > 0) {
+        System.out.println("Scope depth " + scopes.size());
+        for (String key : scopes.get(scopes.size()-1).keySet()) {
+            System.out.println(key + " :: " + scopes.get(scopes.size()-1).get(key));
         }
+
     }
+}
 }
 
 
