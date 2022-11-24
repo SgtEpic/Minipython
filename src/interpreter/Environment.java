@@ -1,129 +1,67 @@
 package interpreter;
 
-import symboltable.Scope;
-import symboltable.Symbol;
-
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class Environment {
-    String name;
-    private int depth;
-    Environment baseEnclosing;
-    Environment enclosing = null;
-    HashMap<String, Value> values = new HashMap<>();
-    Scope scope;
+    final Environment enclosing;
+    private final Map<String, Object> symbols = new HashMap<>();
 
-    int childrenAccessCounter = 0;
-
-    private final ArrayList<Environment> children = new ArrayList<>();
-
-    public Environment(Scope scope, Environment env) {
-        this.scope = scope;
-        this.name = scope.getName();
-        this.depth = scope.getDepth();
-        this.enclosing = env;
-        if (env != null) {
-            this.enclosing.children.add(this);
-        }
-        this.baseEnclosing = getBaseEnvironmentFromScope();
+    public Environment() {
+        enclosing = null;
     }
 
-    public void define(String name, Value value) {
-        values.put(name, value);
-    }
-    public void assign(String name, Value value) {
-        values.put(name, value);
-
-    }
-    public Value get(String name){
-        if (values.containsKey(name)){
-            return values.get(name);
-        }
-        else if(enclosing == null) {
-            return null;
-        }
-        return enclosing.get(name);
-
+    Environment(Environment enclosing) {
+        this.enclosing = enclosing;
     }
 
-    public Value resolve_member(String[] names, int index){
-        //all names processed
-        if(names.length <= index ) {
-
-            return values.get(names[index-1]);
-        }
-        //member exists
-        if (values.containsKey(names[index])){
-
-            Value foundMember = values.get(names[index]);
-            //point to next member
-            index++;
-            //foundMember is a class
-            if(foundMember.getType() == Type.CLASS) {
-                //go into symboltable.Scope of member class and search there for next member
-                Environment memberEnvironment = foundMember.getEnvironment();
-                return memberEnvironment.resolve_member(names, index);
-                //found member is not a class
-            }else{
-                return resolve_member(names, index);
-            }
-            //look in parent class
-        }else if(baseEnclosing != null) {
-            return baseEnclosing.resolve_member(names, index);
-
+    Object get(Symbol symbol) {
+        if (symbols.containsKey(symbol.lexeme)) {
+            return symbols.get(symbol.lexeme);
         }
 
-        return null;
+        if (enclosing != null) return enclosing.get(symbol);
 
+        throw new RuntimeError(symbol, "Undefined name '" + symbol.lexeme + "'.");
     }
 
-    public Value resolve_members(String[] names){
-        if(scope.getType() == null){
-            return null;
+    void assign(Symbol symbol, Object value) {
+        if (symbols.containsKey(symbol.lexeme)) {
+            symbols.put(symbol.lexeme, value);
+            return;
         }
 
-        return resolve_member(names, 0);
-    }
-
-    public void print() {
-        System.out.println(name + ": " + depth);
-        for (String key : values.keySet()) {
-            String s;
-            if(values.get(key)== null){
-                s = this.depth + ": " + key;
-            }else{
-                s =this.depth + ": " + key + " := " + values.get(key).getValue() + " [" + values.get(key).getType() + "]";
-            }
-            System.out.println(s);
+        if (enclosing != null) {
+            enclosing.assign(symbol, value);
+            return;
         }
-        if(values.isEmpty()){
-            System.out.println("No symbols here");
+
+        throw new RuntimeError(symbol, "Undefined name '" + symbol.lexeme + "'.");
+    }
+
+    void define(String name, Object value) {
+        symbols.put(name, value);
+    }
+
+    Environment anchestor(int distance) {
+        Environment environment = this;
+        for (int i = 0; i < distance; i++) {
+            environment = environment.enclosing;
         }
-        System.out.println("");
+
+        return environment;
     }
 
-    public void printChildren(){
-        print();
-        for(Environment child: children){
-            child.printChildren();
-        }
+    Object getAt(int distance, String name) {
+        return anchestor(distance).symbols.get(name);
     }
 
-    public Environment getChildEnvironment(){
-        Environment env = this.children.get(childrenAccessCounter);
-        childrenAccessCounter++;
-        return env;
+    void assignAt(int distance, Symbol symbol, Object value) {
+        anchestor(distance).symbols.put(symbol.lexeme, value);
     }
 
-    private Environment getBaseEnvironmentFromScope() {
-       Environment env = enclosing;
-       while (env != null) {
-           if (scope.getParentClass() == env.scope) {
-               return env;
-           }
-           env = env.enclosing;
-       }
-       return null;
+    @Override
+    public String toString() {
+        return symbols.toString();
     }
 }
