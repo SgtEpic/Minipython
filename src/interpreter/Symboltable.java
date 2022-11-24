@@ -266,7 +266,7 @@ public class Symboltable implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
     private void resolveLocal(Expr expr, Symbol symbol) {
         for (int i = scopes.size() - 1; i >= 0; i--) {
             if (scopes.get(i).containsKey(symbol.lexeme)) {
-                expr.depth = scopes.size() - 1 - i;
+                expr.distance = scopes.size() - 1 - i;
                 return;
             }
         }

@@ -1,3 +1,12 @@
-def foo(a,b,c):
-    d = 1
+def makeCounter():
+    i = 0
+    def count():
+        i = i + 1
+        print(i)
     #end
+    return count
+#end
+
+counter = makeCounter()
+counter()
+counter()

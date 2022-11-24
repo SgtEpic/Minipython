@@ -3,7 +3,7 @@ package interpreter;
 import java.util.List;
 
 public abstract class Expr {
-    int depth = -1;
+    int distance = -1;
     interface Visitor<T> {
         T visitAssignmentExpr(Assignment expr);
         T visitBinaryExpr(Binary expr);

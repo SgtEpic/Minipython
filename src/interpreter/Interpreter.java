@@ -177,7 +177,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
     public Object visitAssignmentExpr(Expr.Assignment expr) {
         Object value = evaluate(expr.value);
 
-        Integer distance = expr.depth;
+        Integer distance = expr.distance;
         // check for local variable before defining
         // no declaration, only assignment
         if (distance != -1) {
@@ -299,7 +299,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
 
     @Override
     public Object visitSuperExpr(Expr.Super expr) {
-        int distance = expr.depth;
+        int distance = expr.distance;
         MPClass superclass = (MPClass) environment.getAt(distance, "super");
         MPInstance object = (MPInstance) environment.getAt(distance - 1, "self");
         MPFunction method = superclass.findMethod(expr.method.lexeme);
@@ -332,9 +332,9 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
     }
 
     private Object lookUpVariable(Symbol symbol, Expr expr) {
-        if (expr.depth != -1) {
+        if (expr.distance != -1) {
             // find local name
-            return environment.getAt(expr.depth, symbol.lexeme);
+            return environment.getAt(expr.distance, symbol.lexeme);
         } else {
             // find global name
             return globals.get(symbol);
