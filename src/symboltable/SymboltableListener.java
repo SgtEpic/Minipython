@@ -209,6 +209,7 @@ public class SymboltableListener {
      */
     private void enter_assignment_node(AssignmentStatement node) {
         Type classType = null;
+        Symbol rightSymbol = null;
         // if the right side is a name of a symbol
         if(node.children.get(1)instanceof NameNode){
             // if there is a . in the name then we have to deal with instances and classes and stuff
@@ -228,13 +229,13 @@ public class SymboltableListener {
                 navigateMembers(node.children.get(1), false, false);
             }else{
                 // here we just try to find the symbol
-                Symbol symbol = scope.resolve(node.children.get(1).children.get(0).name);
+                 rightSymbol = scope.resolve(node.children.get(1).children.get(0).name);
                 // if we can't find the symbol we create an error
-                if(symbol == null){
+                if(rightSymbol == null){
                     errors.addError(node.children.get(1).name + " not found", node.children.get(1).name, node, scope);
                 }else{
                     // if we can find the symbol we want to save the type because it could be a class scope
-                    classType = symbol.getType();
+                    classType = rightSymbol.getType();
                 }
             }
         }
@@ -244,7 +245,10 @@ public class SymboltableListener {
             navigateMembers(node.children.get(0), true, false);
         }else{
             // if the classtype is null we don't have a class instantiation, so it's a variable
-            if(classType == null){
+            if(rightSymbol instanceof Function){
+                Symbol func = new Symbol(node.children.get(0).name);
+                scope.bind(func);
+            }else if(classType == null){
                 Variable var = new Variable(node.children.get(0).name);
                 scope.bind(var);
             }else {
