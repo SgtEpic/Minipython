@@ -19,6 +19,15 @@ class MPInstance {
         MPFunction method = klass.findMethod(name.lexeme);
         if (method != null) return method.bind(this);
 
+        MPClass currentKlass = klass;
+
+        // Search for the method in the superclass
+        while (currentKlass.superclass != null) {
+            method = currentKlass.superclass.findMethod(name.lexeme);
+            if (method != null) return method.bind(this);
+            currentKlass = currentKlass.superclass;
+        }
+
         throw new RuntimeError(name, "Undefined property '" + name.lexeme + "'.");
     }
 
