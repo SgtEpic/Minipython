@@ -141,6 +141,16 @@ public class Symboltable implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
     }
     @Override
     public Void visitAssignmentExpr(Expr.Assignment expr) {
+        // check if variable is already defined -> assignment
+        for (int i = scopes.size() - 1; i >= 0; i--) {
+            if (scopes.get(i).containsKey(expr.symbol.lexeme)) {
+                resolve(expr.value);
+                resolveLocal(expr, expr.symbol);
+                return null;
+            }
+        }
+
+        // -> declaration, definition and assignment
         define(expr.symbol);
         resolve(expr.value);
         resolveLocal(expr, expr.symbol);

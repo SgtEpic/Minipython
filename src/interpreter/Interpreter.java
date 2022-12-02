@@ -135,23 +135,23 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
 
     @Override
     public Void visitIfStmt(Stmt.If stmt) {
+        boolean trueConditionExecuted = false;
+        boolean elifConditionExecuted = false;
         if (isTruthy(evaluate(stmt.condition))) {
             execute(stmt.ifBlock);
-        } else if (!stmt.elifBranch.isEmpty()) {
+            trueConditionExecuted = true;
+        }
+        if (!trueConditionExecuted && !stmt.elifBranch.isEmpty()) {
             for (Stmt.Elif elif : stmt.elifBranch) {
                 if (isTruthy(evaluate(elif.condition))) {
                     execute(elif.block);
+                    elifConditionExecuted = true;
                     break;
                 }
             }
-            if (stmt.elseBranch != null) {
-                execute(stmt.elseBranch);
-            }
-            return null;
-        } else {
-            if (stmt.elseBranch != null) {
-                execute(stmt.elseBranch);
-            }
+        }
+        if (!trueConditionExecuted && !elifConditionExecuted && stmt.elseBranch != null) {
+            execute(stmt.elseBranch);
         }
         return null;
 

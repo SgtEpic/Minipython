@@ -49,16 +49,16 @@ public class Minipython {
         interpreter.interpret(stmts);
 
 
-//        JFrame frame = new JFrame("Antlr CST");
-//        JPanel panel = new JPanel();
-//        TreeViewer viewer = new TreeViewer(Arrays.asList(
-//                parser.getRuleNames()),cst);
-//        viewer.setScale(1.5); // Scale a little
-//        panel.add(viewer);
-//        frame.add(panel);
-//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//        frame.pack();
-//        frame.setVisible(true);
+        JFrame frame = new JFrame("Antlr CST");
+        JPanel panel = new JPanel();
+        TreeViewer viewer = new TreeViewer(Arrays.asList(
+                parser.getRuleNames()),cst);
+        viewer.setScale(1.5); // Scale a little
+        panel.add(viewer);
+        frame.add(panel);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.pack();
+        frame.setVisible(true);
 
     }
 
