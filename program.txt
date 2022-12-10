@@ -1,23 +1,39 @@
-def makeCounter():
-    i = 0
-    def count():
-        i = i + 1
-        print(i)
+class A:
+    def __init__(self):
+        self.number = 6
+        print("hi from A")
     #end
-    return count
 #end
 
-counter = makeCounter()
-counter()
-counter()
-counter()
-counter()
-counter()
+class B(A):
+    def __init__(self):
+        super()
+        self.a = A()
+        print("hi from B")
+    #end
+    def add(self, a,b):
+        return a+b
+    #end
+#end
 
-a = 10
-if a < 10:
-    print("a is less than 10")
-elif a == 10:
-    print("a is equal to 10")
-else:
-    print("a is greater than 10")
+class C(B):
+    def __init__(self):
+        super()
+        self.b = B()
+        print("hi from C")
+    #end
+#end
+
+class D(C):
+    def __init__(self):
+        super()
+        self.c = C()
+        print("hi from D")
+    #end
+#end
+
+
+d = D()
+d.c.b.a.number = 10
+print(d.c.b.a.number)
+print(d.add(100,100))

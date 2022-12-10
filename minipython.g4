@@ -37,7 +37,7 @@ term: factor ( ( PLUS | MINUS ) term )?;
 factor: unary( ( STAR | DIVIDE ) factor )?;
 unary: ( NOT | PLUS | MINUS ) unary | call;
 call: primary ( L_PAREN arguments? R_PAREN | DOT NAME)*;
-primary: NAME | NUMBER | STRING | TRUE | FALSE | L_PAREN expression R_PAREN | SUPER DOT NAME;
+primary: NAME | NUMBER | STRING | TRUE | FALSE | L_PAREN expression R_PAREN | SUPER L_PAREN arguments? R_PAREN;
 
 arguments: expression (COMMA expression)*;
 
@@ -61,7 +61,7 @@ MINUS: '-';
 STAR: '*';
 DIVIDE: '/';
 NOT: 'not';
-SUPER: 'super()';
+SUPER: 'super';
 DOT: '.';
 COMMA: ',';
 COLON: ':';
