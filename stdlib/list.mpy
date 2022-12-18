@@ -90,4 +90,16 @@ class List:
         #end
         return new_list
     #end
+
+    def __str__(self):
+        string = "[ "
+        index = 0
+        while index < self.__len__():
+            element = self.get(index)
+            string = string + element.__str__() + " "
+            index = index + 1
+        #end
+        string = string + "]"
+        return string
+    #end
 #end
