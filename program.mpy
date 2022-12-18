@@ -1,0 +1,5 @@
+a = List()
+a.append(3)
+print(a.__len__())
+print(a.pop())
+print(a.__len__())

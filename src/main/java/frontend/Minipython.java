@@ -16,20 +16,29 @@ public class Minipython {
 
     public static void main(String[] args) throws Exception {
         // create interpreter
-        minipythonLexer lexer = new minipythonLexer(CharStreams.fromFileName("program.txt"));
+        minipythonLexer list_lexer = new minipythonLexer(CharStreams.fromFileName("stdlib/list.mpy"));
+        minipythonLexer lexer = new minipythonLexer(CharStreams.fromFileName("program.mpy"));
 
         // create a buffer of tokens pulled from the lexer
+        CommonTokenStream list_tokens = new CommonTokenStream(list_lexer);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
 
         // create a parser that feeds off the tokens buffer
+        minipythonParser list_parser = new minipythonParser(list_tokens);
         minipythonParser parser = new minipythonParser(tokens);
 
+        ParseTree list_cst = list_parser.program();
         ParseTree cst = parser.program(); // begin parsing at init rule
         System.out.println(cst.toStringTree(parser)); // print LISP-style tree
 
+        VistorCST list_visitorCST = new VistorCST();
         VistorCST visitorCST = new VistorCST();
+
         // create AST
-        Stmt ast = visitorCST.visit(cst);
+        Stmt.Program list_ast = (Stmt.Program) list_visitorCST.visit(list_cst);
+        Stmt.Program ast = (Stmt.Program) visitorCST.visit(cst);
+        // combine list ast and program ast
+        ast.statements.addAll(0, list_ast.statements);
 
         // visitor to print AST
         AstPrinter astVisitorPrinter = new AstPrinter();

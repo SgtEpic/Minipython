@@ -1,0 +1,93 @@
+class List:
+    def __init__(self):
+        self.list = raw_list()
+    #end
+
+    def append(self, item):
+        self.list.__append__(item)
+    #end
+
+    def insert(self, index, item):
+        self.list.__insert__(item, index)
+    #end
+
+    def get(self, index):
+        return self.list.__get__(index)
+    #end
+
+    def __len__(self):
+        return self.list.__len__()
+    #end
+
+    def removeIndex(self, index):
+        self.list.__remove__(index)
+    #end
+
+    def removeItem(self, item):
+        index = 0
+        while index < self.__len__():
+            element = self.get(index)
+            if element == item:
+                self.removeIndex(index)
+                return element
+            else:
+                # this is just here because the code currently needs an else statement. Should be fixed later
+                index = index
+            #end
+            index = index + 1
+        #end
+    #end
+
+    def pop(self):
+        element = self.get(self.__len__()-1)
+        self.removeIndex(self.__len__()-1)
+        return element
+    #end
+
+    def clear(self):
+        while(self.__len__() > 0):
+            self.pop()
+        #end
+    #end
+
+    def index(self, item):
+        index = 0
+        while index < self.__len__():
+            element = self.get(index)
+            if element == item:
+                return index
+            else:
+                # this is just here because the code currently needs an else statement. Should be fixed later
+                index = index
+            #end
+            index = index + 1
+        #end
+    #end
+
+    def count(self, item):
+        index = 0
+        amount = 0
+        while index < self.__len__():
+            element = self.get(index)
+            if element == item:
+                amount = amount + 1
+            else:
+                # this is just here because the code currently needs an else statement. Should be fixed later
+                index = index
+            #end
+            index = index + 1
+        #end
+        return amount
+    #end
+
+    def copy(self):
+        new_list = List()
+        index = 0
+        while index < self.__len__():
+            element = self.get(index)
+            new_list.append(element)
+            index = index + 1
+        #end
+        return new_list
+    #end
+#end
