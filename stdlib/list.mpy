@@ -102,4 +102,19 @@ class List:
         string = string + "]"
         return string
     #end
+
+    def filter(self, filter_func):
+        new_list = List()
+        index = 0
+        while index < self.__len__():
+            element = self.get(index)
+            if filter_func(element):
+                new_list.append(element)
+            else:
+                index = index
+            #end
+            index = index + 1
+        #end
+        return new_list
+    #end
 #end
