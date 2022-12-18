@@ -38,6 +38,7 @@ public class ProgramBuilder {
             "literals/tuple",
             "literals/int",
             "literals/boolean",
+            "literals/list",
             "literals/str",
             "type-hierarchy/object",
             // custom objects

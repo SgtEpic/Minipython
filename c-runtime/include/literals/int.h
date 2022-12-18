@@ -5,6 +5,28 @@
 
 typedef signed long long int __mpy_int_c_type;
 
+typedef struct MPyIntContent {
+    __mpy_int_c_type value;
+    __MPyObj *strMethod;
+    __MPyObj *boolMethod;
+    __MPyObj *addMethod;
+    __MPyObj *subMethod;
+    __MPyObj *mulMethod;
+    __MPyObj *divMethod;
+    __MPyObj *lshiftMethod;
+    __MPyObj *rshiftMethod;
+    __MPyObj *andMethod;
+    __MPyObj *orMethod;
+    __MPyObj *xorMethod;
+
+    __MPyObj *eqMethod;
+    __MPyObj *neMethod;
+    __MPyObj *geMethod;
+    __MPyObj *leMethod;
+    __MPyObj *gtMethod;
+    __MPyObj *ltMethod;
+} MPyIntContent;
+
 __MPyObj* __mpy_obj_init_int(__mpy_int_c_type value);
 
 __MPyObj* __mpy_int_func_str_impl(__MPyObj *args, __MPyObj *kwargs);

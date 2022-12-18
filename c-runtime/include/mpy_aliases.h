@@ -14,3 +14,5 @@
 #define id __MPyFunc_id
 
 #define input __MPyFunc_input
+
+#define raw_list __MPyFunc_raw_list

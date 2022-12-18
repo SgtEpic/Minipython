@@ -21,7 +21,11 @@ extern __MPyObj *__MPyType_Str;
 
 extern __MPyObj *__MPyType_Boolean;
 
+extern __MPyObj *__MPyType_List;
+
 extern __MPyObj *__MPyFunc_id;
+
+extern __MPyObj *__MPyFunc_raw_list;
 
 extern __MPyObj *__MPyFunc_print;
 
@@ -95,6 +99,14 @@ extern __MPyObj *__MPyFunc_Boolean_int;
 // compare boolean
 extern __MPyObj *__MPyFunc_Boolean_eq;
 extern __MPyObj *__MPyFunc_Boolean_ne;
+
+// list
+extern __MPyObj *__MPyFunc_List_bool;
+extern __MPyObj *__MPyFunc_List_insert;
+extern __MPyObj *__MPyFunc_List_get;
+extern __MPyObj *__MPyFunc_List_remove;
+extern __MPyObj *__MPyFunc_List_len;
+extern __MPyObj *__MPyFunc_List_append;
 
 
 extern __MPyObj *__MPyFunc_Object_str;

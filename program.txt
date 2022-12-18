@@ -1,39 +1,41 @@
-class A:
-    def __init__(self):
-        self.number = 6
-        print("hi from A")
-    #end
-#end
+a = raw_list()
+print("Length before:")
+print(a.__len__())
+print("")
 
-class B(A):
-    def __init__(self):
-        super()
-        self.a = A()
-        print("hi from B")
-    #end
-    def add(self, a,b):
-        return a+b
-    #end
-#end
+a.__append__(1)
+a.__append__(2)
 
-class C(B):
-    def __init__(self):
-        super()
-        self.b = B()
-        print("hi from C")
-    #end
-#end
+print("Elements after appending:")
+first = a.__get__(0)
+print("0: " + first.__str__())
+second = a.__get__(1)
+print("1: " + second.__str__())
+print("")
 
-class D(C):
-    def __init__(self):
-        super()
-        self.c = C()
-        print("hi from D")
-    #end
-#end
+a.__insert__(10, 0)
 
+print("Elements after inserting:")
+first = a.__get__(0)
+print("0: " + first.__str__())
+second = a.__get__(1)
+print("1: " + second.__str__())
+third = a.__get__(2)
+print("2: " + third.__str__())
+print("")
 
-d = D()
-d.c.b.a.number = 10
-print(d.c.b.a.number)
-print(d.add(100,100))
+print("Length after adding:")
+print(a.__len__())
+print("")
+
+a.__remove__(2)
+
+print("Elements after removing:")
+first = a.__get__(0)
+print("0: " + first.__str__())
+second = a.__get__(1)
+print("1: " + second.__str__())
+print("")
+
+print("Length after removing:")
+print(a.__len__())

@@ -8,6 +8,7 @@
 #include "literals/tuple.h"
 #include "mpy_obj.h"
 #include "builtin-functions/id.h"
+#include "builtin-functions/raw_list.h"
 #include "builtin-functions/print.h"
 #include "builtin-functions/type.h"
 #include "builtin-functions/input.h"
@@ -17,6 +18,7 @@
 #include "type-hierarchy/object.h"
 #include "literals/str.h"
 #include "literals/int.h"
+#include "literals/list.h"
 
 __MPyObj *__MPyType_Object;
 
@@ -36,7 +38,11 @@ __MPyObj *__MPyType_Str;
 
 __MPyObj *__MPyType_Boolean;
 
+__MPyObj *__MPyType_List;
+
 __MPyObj *__MPyFunc_id;
+
+__MPyObj *__MPyFunc_raw_list;
 
 __MPyObj *__MPyFunc_print;
 
@@ -113,6 +119,13 @@ __MPyObj *__MPyFunc_Boolean_int;
 __MPyObj *__MPyFunc_Boolean_eq;
 __MPyObj *__MPyFunc_Boolean_ne;
 
+// list
+__MPyObj *__MPyFunc_List_bool;
+__MPyObj *__MPyFunc_List_insert;
+__MPyObj *__MPyFunc_List_get;
+__MPyObj *__MPyFunc_List_remove;
+__MPyObj *__MPyFunc_List_len;
+__MPyObj *__MPyFunc_List_append;
 
 __MPyObj *__MPyFunc_Object_str;
 
@@ -147,8 +160,13 @@ void __mpy_builtins_setup() {
 
     __MPyType_Boolean = __mpy_obj_new();
 
+    __MPyType_List = __mpy_obj_new();
+
     __MPyFunc_id = __mpy_obj_init_func(&__mpy_func_id);
     __mpy_obj_ref_inc(__MPyFunc_id);
+
+    __MPyFunc_raw_list = __mpy_obj_init_func(&__mpy_func_raw_list);
+    __mpy_obj_ref_inc(__MPyFunc_raw_list);
 
     __MPyFunc_print = __mpy_obj_init_func(&__mpy_func_print);
     __mpy_obj_ref_inc(__MPyFunc_print);
@@ -260,6 +278,26 @@ void __mpy_builtins_setup() {
     __MPyFunc_Object_init = __mpy_obj_init_func(&__mpy_object_func_init_impl);
     __mpy_obj_ref_inc(__MPyFunc_Object_init);
 
+// list
+    __MPyFunc_List_bool = __mpy_obj_init_func(&__mpy_list_func_bool_impl);
+    __mpy_obj_ref_inc(__MPyFunc_List_bool);
+
+    __MPyFunc_List_get = __mpy_obj_init_func(&__mpy_list_func_get_impl);
+    __mpy_obj_ref_inc(__MPyFunc_List_get);
+
+    __MPyFunc_List_insert = __mpy_obj_init_func(&__mpy_list_func_insert_impl);
+    __mpy_obj_ref_inc(__MPyFunc_List_insert);
+
+    __MPyFunc_List_len = __mpy_obj_init_func(&__mpy_list_func_len_impl);
+    __mpy_obj_ref_inc(__MPyFunc_List_len);
+
+    __MPyFunc_List_remove = __mpy_obj_init_func(&__mpy_list_func_remove_impl);
+    __mpy_obj_ref_inc(__MPyFunc_List_remove);
+
+    __MPyFunc_List_append = __mpy_obj_init_func(&__mpy_list_func_append_impl);
+    __mpy_obj_ref_inc(__MPyFunc_List_append);
+
+// hashmap
     __MPyHashMap *typeObjectAttrs = __mpy_hash_map_init(&__mpy_hash_map_str_key_cmp);
     __mpy_obj_ref_inc(__MPyFunc_Object_str);
     __mpy_hash_map_put(typeObjectAttrs, "__str__", __MPyFunc_Object_str);
@@ -301,6 +339,9 @@ void __mpy_builtins_setup() {
     __mpy_obj_init_type_builtin("bool", __MPyType_Boolean, __mpy_hash_map_init(&__mpy_hash_map_str_key_cmp), __MPyType_Object);
     __mpy_obj_ref_inc(__MPyType_Boolean);
 
+    __mpy_obj_init_type_builtin("list", __MPyType_List, __mpy_hash_map_init(&__mpy_hash_map_str_key_cmp), __MPyType_Object);
+    __mpy_obj_ref_inc(__MPyType_List);
+
     __mpy_super = __mpy_obj_init_func(__mpy_func_super);
     __mpy_obj_ref_inc(__mpy_super);
 }
@@ -324,7 +365,11 @@ void __mpy_builtins_cleanup() {
 
     __mpy_obj_ref_dec(__MPyType_Boolean);
 
+    __mpy_obj_ref_dec(__MPyType_List);
+
     __mpy_obj_ref_dec(__MPyFunc_id);
+
+    __mpy_obj_ref_dec(__MPyFunc_raw_list);
 
     __mpy_obj_ref_dec(__MPyFunc_print);
 
@@ -347,6 +392,19 @@ void __mpy_builtins_cleanup() {
     __mpy_obj_ref_inc(__MPyFunc_Boolean_str);
 
     __mpy_obj_ref_dec(__MPyFunc_Object_str);
+
+// list
+    __mpy_obj_ref_dec(__MPyFunc_List_bool);
+
+    __mpy_obj_ref_dec(__MPyFunc_List_get);
+
+    __mpy_obj_ref_dec(__MPyFunc_List_insert);
+
+    __mpy_obj_ref_dec(__MPyFunc_List_len);
+
+    __mpy_obj_ref_dec(__MPyFunc_List_remove);
+
+    __mpy_obj_ref_dec(__MPyFunc_List_append);
 
     __mpy_obj_ref_dec(__MPyFunc_Object_new);
 
