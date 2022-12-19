@@ -260,7 +260,7 @@ public class VisitorCSTExpr extends minipythonBaseVisitor<Expr> {
     @Override
     public Expr visitList_expression(minipythonParser.List_expressionContext ctx) {
         List<Expr> arguments = new ArrayList<>();
-        if(!ctx.arguments().isEmpty()){
+        if(!ctx.isEmpty() && ctx.arguments() != null &&!ctx.arguments().isEmpty()){
             for (minipythonParser.ExpressionContext expression : ctx.arguments().expression()) {
                 arguments.add(visit(expression));
             }

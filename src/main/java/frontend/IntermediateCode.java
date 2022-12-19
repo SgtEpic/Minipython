@@ -23,7 +23,6 @@ import CBuilder.Reference;
 import CBuilder.variables.VariableDeclaration;
 
 import java.nio.file.Path;
-import java.sql.Ref;
 import java.util.*;
 
 public class IntermediateCode implements Expr.Visitor<Statement>, Stmt.Visitor<Statement>{
@@ -31,7 +30,10 @@ public class IntermediateCode implements Expr.Visitor<Statement>, Stmt.Visitor<S
     ProgramBuilder builder;
     Path fileOutput;
 
+    ArrayList<Frontend_Function> functions = new ArrayList<>();
+
     private int list_expr_count = 0;
+    private int unpacking_count = 0;
 
     IntermediateCode(ProgramBuilder programBuilder, Path fileOutput) {
         this.builder = programBuilder;
@@ -113,10 +115,22 @@ public class IntermediateCode implements Expr.Visitor<Statement>, Stmt.Visitor<S
     @Override
     public Statement visitFunctionStmt(Stmt.Function stmt) {
         // arguments
+        int argumentAmount = 0;
+        int argumentAmountBeforePacking = 0;
+        boolean packing = false;
         List<Argument> arguments = new ArrayList<>();
         for (int i=0; i<stmt.params.size(); i++) {
+            argumentAmount++;
+            if(stmt.params.get(i).packing){
+                packing = true;
+            }
+            if(!packing){
+                argumentAmountBeforePacking++;
+            }
             arguments.add(new Argument(stmt.params.get(i).lexeme, i));
         }
+
+        functions.add(new Frontend_Function(stmt.symbol.lexeme, packing, argumentAmount, argumentAmountBeforePacking));
 
         // body
         List<Statement> body = new ArrayList<>();
@@ -232,8 +246,32 @@ public class IntermediateCode implements Expr.Visitor<Statement>, Stmt.Visitor<S
     @Override
     public Expression visitCallExpr(Expr.Call expr) {
         Expression callee = (Expression) expr.callee.accept(this);
-
         List<Expression> arguments = new ArrayList<>();
+
+        String functionName = callee.buildExpression();
+        for(Frontend_Function func: functions){
+            if(func.name().equals(functionName)){
+                for(int i = 0; i < func.paramAmountBeforePacking(); i++){
+                    arguments.add((Expression) expr.arguments.get(i).accept(this));
+                }
+                if(func.packing()){
+                    VariableDeclaration varD = new VariableDeclaration("list" + list_expr_count);
+                    builder.addVariable(varD);
+                    Reference r = new Reference("list" + list_expr_count);
+                    builder.addStatement(new Assignment(r, new Call(new Reference("List"), List.of())));
+                    if(expr.arguments.size() > func.paramAmountBeforePacking()){
+                        for(int i = func.paramAmountBeforePacking(); i < expr.arguments.size(); i++){
+                            Expression item_expression = (Expression)expr.arguments.get(i).accept(this);
+                            builder.addStatement(new Call(new AttributeReference("append", r), List.of(item_expression)));
+                        }
+                    }
+                    arguments.add(r);
+                    list_expr_count++;
+                }
+                return new Call(callee, arguments);
+            }
+        }
+
         for (Expr argument : expr.arguments) {
             arguments.add((Expression)argument.accept(this));
         }
@@ -344,7 +382,6 @@ public class IntermediateCode implements Expr.Visitor<Statement>, Stmt.Visitor<S
         VariableDeclaration varD = new VariableDeclaration("list" + list_expr_count);
         builder.addVariable(varD);
         Reference r = new Reference("list" + list_expr_count);
-
 
         builder.addStatement(new Assignment(r, new Call(new Reference("List"), List.of())));
 

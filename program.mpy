@@ -1,11 +1,31 @@
-a = [1, 2, 3]
-
-print(a)
-
-a[2] = 5
-
-def func(list):
-    print(list.pop())
+def map(map_func, list):
+    new_list = []
+    index = 0
+    while index < list.__len__():
+        element = list.get(index)
+        new_list.append(map_func(element))
+        index = index + 1
+    #end
+    return new_list
 #end
 
-func(a)
+def map_fun(a):
+    return a * a
+#end
+
+a = [1, 2, 3]
+b = map(map_fun, a)
+print(b)
+
+
+def packing(*items):
+    print(items.get(0))
+#end
+
+a = List()
+a.append(1)
+a.append(2)
+b = List()
+b.append(4)
+b.append(5)
+packing(a, b)
