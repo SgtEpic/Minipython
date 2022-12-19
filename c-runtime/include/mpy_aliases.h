@@ -16,3 +16,5 @@
 #define input __MPyFunc_input
 
 #define raw_list __MPyFunc_raw_list
+
+#define len __MPyFunc_len

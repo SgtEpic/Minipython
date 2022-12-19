@@ -17,6 +17,7 @@ public class Symboltable implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
         globals.put("print", new Symbol(SymbolType.L_PAREN, "print", null, -1, -1));
         globals.put("input", new Symbol(SymbolType.L_PAREN, "print", null, -1, -1));
         globals.put("raw_list", new Symbol(SymbolType.L_PAREN, "raw_list", null, -1, -1));
+        globals.put("len", new Symbol(SymbolType.L_PAREN, "len", null, -1, -1));
     }
 
     private enum FunctionType {

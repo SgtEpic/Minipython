@@ -13,18 +13,6 @@
 #include "literals/int.h"
 #include "type-hierarchy/bound-method.h"
 
-typedef struct MPyListContent {
-    __MPyObj *value;
-    __MPyObj *next;
-    int size;
-    __MPyObj *boolMethod;
-    __MPyObj *insertMethod;
-    __MPyObj *getMethod;
-    __MPyObj *removeMethod;
-    __MPyObj *lenMethod;
-    __MPyObj *appendMethod;
-} MPyListContent;
-
 __MPyObj* __mpy_list_set_attr_impl(__MPyObj *self, const char *name, __MPyObj *value) {
     (void)self;
     (void)name;

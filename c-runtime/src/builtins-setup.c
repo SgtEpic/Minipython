@@ -9,6 +9,7 @@
 #include "mpy_obj.h"
 #include "builtin-functions/id.h"
 #include "builtin-functions/raw_list.h"
+#include "builtin-functions/len.h"
 #include "builtin-functions/print.h"
 #include "builtin-functions/type.h"
 #include "builtin-functions/input.h"
@@ -43,6 +44,8 @@ __MPyObj *__MPyType_List;
 __MPyObj *__MPyFunc_id;
 
 __MPyObj *__MPyFunc_raw_list;
+
+__MPyObj *__MPyFunc_len;
 
 __MPyObj *__MPyFunc_print;
 
@@ -167,6 +170,9 @@ void __mpy_builtins_setup() {
 
     __MPyFunc_raw_list = __mpy_obj_init_func(&__mpy_func_raw_list);
     __mpy_obj_ref_inc(__MPyFunc_raw_list);
+
+    __MPyFunc_len = __mpy_obj_init_func(&__mpy_func_len);
+    __mpy_obj_ref_inc(__MPyFunc_len);
 
     __MPyFunc_print = __mpy_obj_init_func(&__mpy_func_print);
     __mpy_obj_ref_inc(__MPyFunc_print);
@@ -370,6 +376,8 @@ void __mpy_builtins_cleanup() {
     __mpy_obj_ref_dec(__MPyFunc_id);
 
     __mpy_obj_ref_dec(__MPyFunc_raw_list);
+
+    __mpy_obj_ref_dec(__MPyFunc_len);
 
     __mpy_obj_ref_dec(__MPyFunc_print);
 

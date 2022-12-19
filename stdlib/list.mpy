@@ -17,7 +17,7 @@ class List:
 
     def set(self, index, item):
         self.removeIndex(index)
-        if self.__len__() == 0:
+        if len(self) == 0:
             self.append(item)
         else:
             self.insert(index-1, item)
@@ -34,7 +34,7 @@ class List:
 
     def removeItem(self, item):
         index = 0
-        while index < self.__len__():
+        while index < len(self):
             element = self.get(index)
             if element == item:
                 self.removeIndex(index)
@@ -48,20 +48,20 @@ class List:
     #end
 
     def pop(self):
-        element = self.get(self.__len__()-1)
-        self.removeIndex(self.__len__()-1)
+        element = self.get(len(self)-1)
+        self.removeIndex(len(self)-1)
         return element
     #end
 
     def clear(self):
-        while(self.__len__() > 0):
+        while(len(self) > 0):
             self.pop()
         #end
     #end
 
     def index(self, item):
         index = 0
-        while index < self.__len__():
+        while index < len(self):
             element = self.get(index)
             if element == item:
                 return index
@@ -76,7 +76,7 @@ class List:
     def count(self, item):
         index = 0
         amount = 0
-        while index < self.__len__():
+        while index < len(self):
             element = self.get(index)
             if element == item:
                 amount = amount + 1
@@ -92,7 +92,7 @@ class List:
     def copy(self):
         new_list = List()
         index = 0
-        while index < self.__len__():
+        while index < len(self):
             element = self.get(index)
             new_list.append(element)
             index = index + 1
@@ -103,7 +103,7 @@ class List:
     def __str__(self):
         string = "[ "
         index = 0
-        while index < self.__len__():
+        while index < len(self):
             element = self.get(index)
             string = string + element.__str__() + " "
             index = index + 1
@@ -115,7 +115,7 @@ class List:
     def filter(self, filter_func):
         new_list = List()
         index = 0
-        while index < self.__len__():
+        while index < len(self):
             element = self.get(index)
             if filter_func(element):
                 new_list.append(element)
@@ -130,7 +130,7 @@ class List:
     def map(self, map_func):
         new_list = List()
         index = 0
-        while index < self.__len__():
+        while index < len(self):
             element = self.get(index)
             new_list.append(map_func(element))
             index = index + 1
@@ -141,7 +141,7 @@ class List:
     def reduce(self, reduce_func):
         left_element = self.get(0)
         index = 1
-        while index < self.__len__():
+        while index < len(self):
             right_element = self.get(index)
             left_element = reduce_func(left_element, right_element)
             index = index + 1
@@ -153,7 +153,7 @@ class List:
 def filter(filter_func, list):
         new_list = List()
         index = 0
-        while index < list.__len__():
+        while index < len(list):
             element = list.get(index)
             if filter_func(element):
                 new_list.append(element)
@@ -168,7 +168,7 @@ def filter(filter_func, list):
     def map(map_func, list):
         new_list = List()
         index = 0
-        while index < list.__len__():
+        while index < len(list):
             element = list.get(index)
             new_list.append(map_func(element))
             index = index + 1
@@ -179,7 +179,7 @@ def filter(filter_func, list):
     def reduce(reduce_func, list):
         left_element = list.get(0)
         index = 1
-        while index < list.__len__():
+        while index < len(list):
             right_element = list.get(index)
             left_element = reduce_func(left_element, right_element)
             index = index + 1
