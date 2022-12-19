@@ -1,6 +1,5 @@
-package antlr;
 // Generated from java-escape by ANTLR 4.11.1
-
+package antlr;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -161,6 +160,18 @@ public class minipythonBaseListener implements minipythonListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterName(minipythonParser.NameContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitName(minipythonParser.NameContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterExpression_stmt(minipythonParser.Expression_stmtContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -300,6 +311,18 @@ public class minipythonBaseListener implements minipythonListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitPrimary(minipythonParser.PrimaryContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterList_expression(minipythonParser.List_expressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitList_expression(minipythonParser.List_expressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

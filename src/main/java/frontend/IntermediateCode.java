@@ -23,12 +23,15 @@ import CBuilder.Reference;
 import CBuilder.variables.VariableDeclaration;
 
 import java.nio.file.Path;
+import java.sql.Ref;
 import java.util.*;
 
 public class IntermediateCode implements Expr.Visitor<Statement>, Stmt.Visitor<Statement>{
 
     ProgramBuilder builder;
     Path fileOutput;
+
+    private int list_expr_count = 0;
 
     IntermediateCode(ProgramBuilder programBuilder, Path fileOutput) {
         this.builder = programBuilder;
@@ -178,6 +181,17 @@ public class IntermediateCode implements Expr.Visitor<Statement>, Stmt.Visitor<S
     @Override
     public Statement visitAssignmentExpr(Expr.Assignment expr) {
         // TODO fix variable declaration and assignment
+        if(expr.symbol.array){
+            Expression e = (Expression) expr.value.accept(this);
+            List<Expression> args = new ArrayList<>();
+            if(expr.symbol.index.type == SymbolType.NUMBER){
+                args.add(new IntLiteral(Integer.parseInt(expr.symbol.index.lexeme)));
+            } else {
+                args.add(new Reference(expr.symbol.index.lexeme));
+            }
+            args.add(e);
+            return new Call(new AttributeReference("set", new Reference(expr.symbol.lexeme)), args);
+        }
         VariableDeclaration varD = new VariableDeclaration(expr.symbol.lexeme);
         builder.addVariable(varD);
         Reference r = new Reference(expr.symbol.lexeme);
@@ -313,6 +327,32 @@ public class IntermediateCode implements Expr.Visitor<Statement>, Stmt.Visitor<S
 
     @Override
     public Expression visitVariableExpr(Expr.Variable expr) {
+        if(expr.symbol.array){
+            List<Expression> args = new ArrayList<>();
+            if(expr.symbol.index.type == SymbolType.NUMBER){
+                args.add(new IntLiteral(Integer.parseInt(expr.symbol.index.lexeme)));
+            } else {
+                args.add(new Reference(expr.symbol.index.lexeme));
+            }
+            return new Call(new AttributeReference("get", new Reference(expr.symbol.lexeme)), args);
+        }
         return new Reference(expr.symbol.lexeme);
+    }
+
+    @Override
+    public Statement visitListExpr(Expr.Array expr) {
+        VariableDeclaration varD = new VariableDeclaration("list" + list_expr_count);
+        builder.addVariable(varD);
+        Reference r = new Reference("list" + list_expr_count);
+
+
+        builder.addStatement(new Assignment(r, new Call(new Reference("List"), List.of())));
+
+        for(Expr item: expr.content){
+            Expression item_expression = (Expression)item.accept(this);
+            builder.addStatement(new Call(new AttributeReference("append", r), List.of(item_expression)));
+        }
+        list_expr_count++;
+        return r;
     }
 }

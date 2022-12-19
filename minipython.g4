@@ -11,7 +11,7 @@ statement: funcdef
     ;
 
 block: statement*;
-parameters: (NAME (COMMA NAME)*);
+parameters: (name (COMMA name)*);
 
 funcdef: DEF NAME L_PAREN parameters? R_PAREN COLON block END;
 
@@ -26,9 +26,11 @@ if_stmt: IF expression_stmt COLON block;
 elif_stmt: ELIF expression_stmt COLON block;
 else_stmt: ELSE COLON block;
 
+name: STAR? NAME (L_BRACKET (NUMBER | NAME) R_BRACKET)?;
+
 expression_stmt: expression;
 expression: assignment;
-assignment: (call DOT)? NAME ASSIGN assignment | logic_or;
+assignment: (call DOT)? name ASSIGN assignment | logic_or;
 logic_or: logic_and (OR logic_or )?;
 logic_and: equality (AND logic_and )?;
 equality: comparison ( ( EQ | NEQ ) equality )?;
@@ -36,11 +38,11 @@ comparison: term ( ( LT | GT | LTE | GTE ) comparison )?;
 term: factor ( ( PLUS | MINUS ) term )?;
 factor: unary( ( STAR | DIVIDE ) factor )?;
 unary: ( NOT | PLUS | MINUS ) unary | call;
-call: primary ( L_PAREN arguments? R_PAREN | DOT NAME)*;
-primary: NAME | NUMBER | STRING | TRUE | FALSE | L_PAREN expression R_PAREN | SUPER L_PAREN arguments? R_PAREN;
+call: primary ( L_PAREN arguments? R_PAREN | DOT name)*;
+primary: list_expression | name | NUMBER | STRING | TRUE | FALSE | L_PAREN expression R_PAREN | SUPER L_PAREN arguments? R_PAREN;
+list_expression: L_BRACKET arguments? R_BRACKET;
 
 arguments: expression (COMMA expression)*;
-
 
 /*lexer*/
 WHITESPACE: [ \t\r\n]+ -> skip;
@@ -67,6 +69,8 @@ COMMA: ',';
 COLON: ':';
 L_PAREN: '(';
 R_PAREN: ')';
+L_BRACKET: '[';
+R_BRACKET: ']';
 
 DEF: 'def';
 CLASS: 'class';

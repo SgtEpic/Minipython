@@ -1,16 +1,12 @@
 package frontend;
 
 import CBuilder.ProgramBuilder;
-import antlr.minipythonLexer;
-import antlr.minipythonParser;
-import org.antlr.v4.gui.TreeViewer;
+import antlr.*;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 
-import javax.swing.*;
 import java.nio.file.Path;
-import java.util.Arrays;
 
 public class Minipython {
 

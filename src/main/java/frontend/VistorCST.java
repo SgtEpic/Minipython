@@ -78,8 +78,8 @@ public class VistorCST extends minipythonBaseVisitor<Stmt> {
         Symbol name = new Symbol(SymbolType.NAME, ctx.NAME().getText(), null, ctx.NAME().getSymbol().getLine(), ctx.NAME().getSymbol().getCharPositionInLine());
         List<Symbol> params = new ArrayList<>();
         if (ctx.parameters() != null) {
-            for (int i = 0; i < ctx.parameters().NAME().size(); i++) {
-                params.add(new Symbol(SymbolType.NAME, ctx.parameters().NAME(i).getText(), null, ctx.parameters().NAME(i).getSymbol().getLine(), ctx.parameters().NAME(i).getSymbol().getCharPositionInLine()));
+            for (int i = 0; i < ctx.parameters().name().size(); i++) {
+                params.add(new Symbol(SymbolType.NAME, ctx.parameters().name(i).getText(), null, ctx.parameters().name(i).NAME(0).getSymbol().getLine(), ctx.parameters().name(i).NAME(0).getSymbol().getCharPositionInLine()));
             }
         }
         Stmt.Block block = (Stmt.Block) visit(ctx.block());
@@ -102,7 +102,5 @@ public class VistorCST extends minipythonBaseVisitor<Stmt> {
         Stmt.Block block = (Stmt.Block) visit(ctx.block());
         return new Stmt.While(condition, block);
     }
-
-
 }
 

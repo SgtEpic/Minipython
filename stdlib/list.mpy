@@ -15,6 +15,15 @@ class List:
         return self.list.__get__(index)
     #end
 
+    def set(self, index, item):
+        self.removeIndex(index)
+        if self.__len__() == 0:
+            self.append(item)
+        else:
+            self.insert(index-1, item)
+        #end
+    #end
+
     def __len__(self):
         return self.list.__len__()
     #end

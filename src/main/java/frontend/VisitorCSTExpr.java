@@ -21,7 +21,7 @@ public class VisitorCSTExpr extends minipythonBaseVisitor<Expr> {
             // check for call assignment
             if (ctx.call() != null) {
                 Expr expr = visit(ctx.call());
-                Symbol symbol = new Symbol(SymbolType.NAME, ctx.NAME().getText(), null, ctx.NAME().getSymbol().getLine(), ctx.NAME().getSymbol().getCharPositionInLine());
+                Symbol symbol = new Symbol(SymbolType.NAME, ctx.name().getText(), null, ctx.name().NAME(0).getSymbol().getLine(), ctx.name().NAME(0).getSymbol().getCharPositionInLine());
                 if (expr instanceof Expr.Get) {
                     Expr.Get g = (Expr.Get) expr;
                     // chain last getter
@@ -45,7 +45,7 @@ public class VisitorCSTExpr extends minipythonBaseVisitor<Expr> {
             }
             // no call -> simple assignment
             else {
-                Symbol t = new Symbol(SymbolType.NAME, ctx.NAME().getText(), null, ctx.NAME().getSymbol().getLine(), ctx.NAME().getSymbol().getCharPositionInLine());
+                Symbol t = new Symbol(SymbolType.NAME, ctx.name().getText(), null, ctx.name().NAME(0).getSymbol().getLine(), ctx.name().NAME(0).getSymbol().getCharPositionInLine());
                 return new Expr.Assignment(t, value);
             }
 
@@ -189,7 +189,7 @@ public class VisitorCSTExpr extends minipythonBaseVisitor<Expr> {
                         parenIndex++;
                         break;
                     case ".":
-                        symbol = new Symbol(SymbolType.NAME, ctx.NAME(dotIndex).getText(), null, ctx.NAME(dotIndex).getSymbol().getLine(), ctx.NAME(dotIndex).getSymbol().getCharPositionInLine());
+                        symbol = new Symbol(SymbolType.NAME, ctx.name(dotIndex).getText(), null, ctx.name(dotIndex).NAME(0).getSymbol().getLine(), ctx.name(dotIndex).NAME(0).getSymbol().getCharPositionInLine());
                         expr = new Expr.Get(expr, symbol);
                         dotIndex++;
                         break;
@@ -203,14 +203,14 @@ public class VisitorCSTExpr extends minipythonBaseVisitor<Expr> {
     @Override
     public Expr visitPrimary(minipythonParser.PrimaryContext ctx) {
         // check for name
-        if (ctx.NAME() != null && ctx.SUPER() == null) {
+        if (ctx.name() != null && ctx.SUPER() == null) {
             // check for keyword self
-            if (ctx.NAME().getText().equals("self")) {
-                Symbol symbol = new Symbol(SymbolType.SELF, ctx.NAME().getText(), null, ctx.NAME().getSymbol().getLine(), ctx.NAME().getSymbol().getCharPositionInLine());
+            if (ctx.name().NAME(0).getText().equals("self")) {
+                Symbol symbol = new Symbol(SymbolType.SELF, ctx.name().getText(), null, ctx.name().NAME(0).getSymbol().getLine(), ctx.name().NAME(0).getSymbol().getCharPositionInLine());
                 return new Expr.Self(symbol);
             }
             // simple name
-            return new Expr.Variable(new Symbol(SymbolType.NAME, ctx.NAME().getText(), null, ctx.NAME().getSymbol().getLine(), ctx.NAME().getSymbol().getCharPositionInLine()));
+            return new Expr.Variable(new Symbol(SymbolType.NAME, ctx.name().getText(), null, ctx.name().NAME(0).getSymbol().getLine(), ctx.name().NAME(0).getSymbol().getCharPositionInLine()));
         }
         // check for number
         if (ctx.NUMBER() != null) {
@@ -245,10 +245,26 @@ public class VisitorCSTExpr extends minipythonBaseVisitor<Expr> {
             return new Expr.Grouping(visit(ctx.expression()));
         }
 
+        if(ctx.list_expression() != null){
+            return visit(ctx.list_expression());
+        }
+
         // not implemented
         /*if (ctx.NONE() != null) {
             return new Expr.Literal(null);
         }*/
         return visit(ctx.expression());
+    }
+
+
+    @Override
+    public Expr visitList_expression(minipythonParser.List_expressionContext ctx) {
+        List<Expr> arguments = new ArrayList<>();
+        if(!ctx.arguments().isEmpty()){
+            for (minipythonParser.ExpressionContext expression : ctx.arguments().expression()) {
+                arguments.add(visit(expression));
+            }
+        }
+        return new Expr.Array(arguments);
     }
 }

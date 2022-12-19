@@ -1,5 +1,5 @@
-package antlr;
 // Generated from java-escape by ANTLR 4.11.1
+package antlr;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 /**
@@ -83,6 +83,12 @@ public interface minipythonVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitElse_stmt(minipythonParser.Else_stmtContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link minipythonParser#name}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitName(minipythonParser.NameContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link minipythonParser#expression_stmt}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -154,6 +160,12 @@ public interface minipythonVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitPrimary(minipythonParser.PrimaryContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link minipythonParser#list_expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitList_expression(minipythonParser.List_expressionContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link minipythonParser#arguments}.
 	 * @param ctx the parse tree

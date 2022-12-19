@@ -1,7 +1,5 @@
 package frontend;
 
-import antlr.minipythonParser;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -246,6 +244,15 @@ public class Symboltable implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
             Minipython.error(expr.symbol, "Cannot read local variable in its own initializer.");
         }
         resolveLocal(expr, expr.symbol);
+        return null;
+    }
+
+    @Override
+    public Void visitListExpr(Expr.Array expr) {
+        for(Expr argument: expr.content){
+            resolve(argument);
+        }
+
         return null;
     }
 

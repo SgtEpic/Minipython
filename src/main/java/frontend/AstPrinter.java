@@ -164,7 +164,12 @@ public class AstPrinter implements Expr.Visitor<String>, Stmt.Visitor<String> {
         return expr.symbol.lexeme;
     }
 
-//> print-utilities
+    @Override
+    public String visitListExpr(Expr.Array expr) {
+        return parenthesize2("list", expr.content);
+    }
+
+    //> print-utilities
         private String parenthesize(String name, Expr... exprs) {
             StringBuilder builder = new StringBuilder();
 

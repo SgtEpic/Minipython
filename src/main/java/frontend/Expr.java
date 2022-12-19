@@ -17,6 +17,7 @@ public abstract class Expr {
         T visitSuperExpr(Super expr);
         T visitUnaryExpr(Unary expr);
         T visitVariableExpr(Variable expr);
+        T visitListExpr(Array expr);
 
     }
 
@@ -187,7 +188,17 @@ public abstract class Expr {
         }
     }
 
+    static class Array extends Expr {
+        final List<Expr> content;
+        Array(List<Expr> content) {
+            this.content = content;
+        }
 
+        @Override
+        <T> T accept(Visitor<T> visitor) {
+            return visitor.visitListExpr(this);
+        }
+    }
 
     abstract <T> T accept(Visitor<T> visitor);
 }

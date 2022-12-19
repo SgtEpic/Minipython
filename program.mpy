@@ -1,20 +1,11 @@
-def ff(item):
-    if item > 5:
-        return True
-    else:
-        return False
-    #end
+a = [1, 2, 3]
+
+print(a)
+
+a[2] = 5
+
+def func(list):
+    print(list.pop())
 #end
 
-list = List()
-i = 0
-while i < 10:
-    list.append(i)
-    i = i + 1
-#end
-
-filtered_list = list.filter(ff)
-
-print(filtered_list.__len__())
-print(filtered_list.get(0))
-print(filtered_list.get(filtered_list.__len__()-1))
+func(a)

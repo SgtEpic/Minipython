@@ -1,5 +1,5 @@
-package antlr;
 // Generated from java-escape by ANTLR 4.11.1
+package antlr;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
@@ -128,6 +128,16 @@ public interface minipythonListener extends ParseTreeListener {
 	 */
 	void exitElse_stmt(minipythonParser.Else_stmtContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link minipythonParser#name}.
+	 * @param ctx the parse tree
+	 */
+	void enterName(minipythonParser.NameContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link minipythonParser#name}.
+	 * @param ctx the parse tree
+	 */
+	void exitName(minipythonParser.NameContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link minipythonParser#expression_stmt}.
 	 * @param ctx the parse tree
 	 */
@@ -247,6 +257,16 @@ public interface minipythonListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitPrimary(minipythonParser.PrimaryContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link minipythonParser#list_expression}.
+	 * @param ctx the parse tree
+	 */
+	void enterList_expression(minipythonParser.List_expressionContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link minipythonParser#list_expression}.
+	 * @param ctx the parse tree
+	 */
+	void exitList_expression(minipythonParser.List_expressionContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link minipythonParser#arguments}.
 	 * @param ctx the parse tree
