@@ -1,31 +1,21 @@
-def map(map_func, list):
-    new_list = []
-    index = 0
-    while index < list.__len__():
-        element = list.get(index)
-        new_list.append(map_func(element))
-        index = index + 1
-    #end
-    return new_list
+list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+def reduce_function(a, b):
+    return a + b
 #end
 
-def map_fun(a):
+def map_function(a):
     return a * a
 #end
 
-a = [1, 2, 3]
-b = map(map_fun, a)
-print(b)
-
-
-def packing(*items):
-    print(items.get(0))
+def filter_function(a):
+    if a > 5:
+        return True
+    else:
+        return False
+    #end
 #end
 
-a = List()
-a.append(1)
-a.append(2)
-b = List()
-b.append(4)
-b.append(5)
-packing(a, b)
+print(reduce(reduce_function, list))
+print(map(map_function, list))
+print(filter(filter_function, list))

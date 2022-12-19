@@ -126,4 +126,63 @@ class List:
         #end
         return new_list
     #end
+
+    def map(self, map_func):
+        new_list = List()
+        index = 0
+        while index < self.__len__():
+            element = self.get(index)
+            new_list.append(map_func(element))
+            index = index + 1
+        #end
+        return new_list
+    #end
+
+    def reduce(self, reduce_func):
+        left_element = self.get(0)
+        index = 1
+        while index < self.__len__():
+            right_element = self.get(index)
+            left_element = reduce_func(left_element, right_element)
+            index = index + 1
+        #end
+        return left_element
+    #end
 #end
+
+def filter(filter_func, list):
+        new_list = List()
+        index = 0
+        while index < list.__len__():
+            element = list.get(index)
+            if filter_func(element):
+                new_list.append(element)
+            else:
+                index = index
+            #end
+            index = index + 1
+        #end
+        return new_list
+    #end
+
+    def map(map_func, list):
+        new_list = List()
+        index = 0
+        while index < list.__len__():
+            element = list.get(index)
+            new_list.append(map_func(element))
+            index = index + 1
+        #end
+        return new_list
+    #end
+
+    def reduce(reduce_func, list):
+        left_element = list.get(0)
+        index = 1
+        while index < list.__len__():
+            right_element = list.get(index)
+            left_element = reduce_func(left_element, right_element)
+            index = index + 1
+        #end
+        return left_element
+    #end

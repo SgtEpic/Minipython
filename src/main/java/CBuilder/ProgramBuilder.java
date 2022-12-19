@@ -139,14 +139,14 @@ public class ProgramBuilder {
         }
         program.append('\n');
 
-        for (Function f : globalFunctions) {
-            program.append(f.buildFuncObjectDeclaration());
-            program.append(f.buildCFunction());
+        for (MPyClass c : classes) {
+            program.append(c.buildDeclaration());
         }
         program.append('\n');
 
-        for (MPyClass c : classes) {
-            program.append(c.buildDeclaration());
+        for (Function f : globalFunctions) {
+            program.append(f.buildFuncObjectDeclaration());
+            program.append(f.buildCFunction());
         }
         program.append('\n');
 
