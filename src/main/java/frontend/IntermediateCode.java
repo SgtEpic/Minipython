@@ -33,7 +33,7 @@ public class IntermediateCode implements Expr.Visitor<Statement>, Stmt.Visitor<S
     ArrayList<Frontend_Function> functions = new ArrayList<>();
 
     private int list_expr_count = 0;
-    private int unpacking_count = 0;
+    List<Statement> statements = new ArrayList<>();
 
     IntermediateCode(ProgramBuilder programBuilder, Path fileOutput) {
         this.builder = programBuilder;
@@ -46,7 +46,6 @@ public class IntermediateCode implements Expr.Visitor<Statement>, Stmt.Visitor<S
 
     @Override
     public Statement visitProgramStmt(Stmt.Program stmt) {
-        List<Statement> statements = new ArrayList<>();
         stmt.statements.forEach(statement -> statements.add(statement.accept(this)));
         for (Statement statement : statements) {
             if (statement instanceof Function) {
@@ -258,11 +257,11 @@ public class IntermediateCode implements Expr.Visitor<Statement>, Stmt.Visitor<S
                     VariableDeclaration varD = new VariableDeclaration("list" + list_expr_count);
                     builder.addVariable(varD);
                     Reference r = new Reference("list" + list_expr_count);
-                    builder.addStatement(new Assignment(r, new Call(new Reference("List"), List.of())));
+                    statements.add(new Assignment(r, new Call(new Reference("List"), List.of())));
                     if(expr.arguments.size() > func.paramAmountBeforePacking()){
                         for(int i = func.paramAmountBeforePacking(); i < expr.arguments.size(); i++){
                             Expression item_expression = (Expression)expr.arguments.get(i).accept(this);
-                            builder.addStatement(new Call(new AttributeReference("append", r), List.of(item_expression)));
+                            statements.add(new Call(new AttributeReference("append", r), List.of(item_expression)));
                         }
                     }
                     arguments.add(r);
@@ -383,11 +382,11 @@ public class IntermediateCode implements Expr.Visitor<Statement>, Stmt.Visitor<S
         builder.addVariable(varD);
         Reference r = new Reference("list" + list_expr_count);
 
-        builder.addStatement(new Assignment(r, new Call(new Reference("List"), List.of())));
+        statements.add(new Assignment(r, new Call(new Reference("List"), List.of())));
 
         for(Expr item: expr.content){
             Expression item_expression = (Expression)item.accept(this);
-            builder.addStatement(new Call(new AttributeReference("append", r), List.of(item_expression)));
+            statements.add(new Call(new AttributeReference("append", r), List.of(item_expression)));
         }
         list_expr_count++;
         return r;
