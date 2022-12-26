@@ -41,7 +41,7 @@ class List:
                 return element
             else:
                 # this is just here because the code currently needs an else statement. Should be fixed later
-                index = index
+                i = 0
             #end
             index = index + 1
         #end
@@ -67,7 +67,7 @@ class List:
                 return index
             else:
                 # this is just here because the code currently needs an else statement. Should be fixed later
-                index = index
+                i = 0
             #end
             index = index + 1
         #end
@@ -82,7 +82,7 @@ class List:
                 amount = amount + 1
             else:
                 # this is just here because the code currently needs an else statement. Should be fixed later
-                index = index
+                i = 0
             #end
             index = index + 1
         #end
@@ -120,7 +120,7 @@ class List:
             if filter_func(element):
                 new_list.append(element)
             else:
-                index = index
+                i = 0
             #end
             index = index + 1
         #end
@@ -158,7 +158,7 @@ def filter(filter_func, list):
             if filter_func(element):
                 new_list.append(element)
             else:
-                index = index
+                i = 0
             #end
             index = index + 1
         #end

@@ -2,6 +2,8 @@
 package antlr;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 
+import java.io.IOException;
+
 /**
  * This class provides an empty implementation of {@link minipythonVisitor},
  * which can be extended to create a visitor which only needs to handle a subset
@@ -19,6 +21,28 @@ public class minipythonBaseVisitor<T> extends AbstractParseTreeVisitor<T> implem
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public T visitProgram(minipythonParser.ProgramContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitImport_statement(minipythonParser.Import_statementContext ctx) {
+        return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitFile_import(minipythonParser.File_importContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitMember_import(minipythonParser.Member_importContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *

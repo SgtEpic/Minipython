@@ -1,7 +1,11 @@
 package frontend;
 
 import antlr.*;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.tree.ParseTree;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,13 +13,68 @@ public class VistorCST extends minipythonBaseVisitor<Stmt> {
 
     public VisitorCSTExpr exprVisitor = new VisitorCSTExpr();
 
+    private static Stmt fileToAST(String fileName) throws IOException {
+        minipythonLexer lexer = new minipythonLexer(CharStreams.fromFileName(fileName + ".mpy"));
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+        minipythonParser parser = new minipythonParser(tokens);
+        ParseTree cst = parser.program();
+        VistorCST visitorCST = new VistorCST();
+
+        return visitorCST.visit(cst);
+    }
     @Override
     public Stmt visitProgram(minipythonParser.ProgramContext ctx) {
         List<Stmt> statements = new ArrayList<>();
+        for (minipythonParser.Import_statementContext importStatementContext : ctx.import_statement()) {
+            Stmt statement = visit(importStatementContext);
+            if(statement instanceof Stmt.Program program){
+                statements.addAll(program.statements);
+            } else {
+                statements.add(statement);
+            }
+        }
         for (minipythonParser.StatementContext statementContext : ctx.statement()) {
             statements.add(visit(statementContext));
         }
         return new Stmt.Program(statements);
+    }
+
+    @Override public Stmt visitImport_statement(minipythonParser.Import_statementContext ctx) {
+        if(ctx.file_import() != null){
+            return visitFile_import(ctx.file_import());
+        } else {
+            return visitMember_import(ctx.member_import());
+        }
+    }
+
+    @Override public Stmt visitFile_import(minipythonParser.File_importContext ctx) {
+        try {
+            return fileToAST(ctx.NAME().getText());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override public Stmt visitMember_import(minipythonParser.Member_importContext ctx){
+        Stmt.Program ast = null;
+        try {
+            ast = (Stmt.Program) fileToAST(ctx.NAME(0).getText());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        for(Stmt statement: ast.statements){
+            if(statement instanceof Stmt.Function func){
+                if(func.symbol.lexeme.equals(ctx.NAME(1).getText())){
+                    return func;
+                }
+            }
+            if(statement instanceof Stmt.Class clazz){
+                if(clazz.symbol.lexeme.equals(ctx.NAME(1).getText())){
+                    return clazz;
+                }
+            }
+        }
+        throw new RuntimeException("Requested object " + ctx.NAME(1).getText() + " does not exist");
     }
 
     @Override

@@ -1,6 +1,12 @@
 grammar minipython;
 
-program: statement* EOF;
+program: import_statement* statement* EOF;
+
+import_statement: file_import | member_import;
+
+file_import: IMPORT NAME;
+
+member_import: FROM NAME IMPORT NAME;
 
 statement: funcdef
     | classdef
@@ -72,6 +78,8 @@ R_PAREN: ')';
 L_BRACKET: '[';
 R_BRACKET: ']';
 
+IMPORT: 'import';
+FROM: 'from';
 DEF: 'def';
 CLASS: 'class';
 WHILE: 'while';

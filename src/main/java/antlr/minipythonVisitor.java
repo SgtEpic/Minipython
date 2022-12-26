@@ -2,6 +2,8 @@
 package antlr;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
+import java.io.IOException;
+
 /**
  * This interface defines a complete generic visitor for a parse tree produced
  * by {@link minipythonParser}.
@@ -16,6 +18,24 @@ public interface minipythonVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitProgram(minipythonParser.ProgramContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link minipythonParser#import_statement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitImport_statement(minipythonParser.Import_statementContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link minipythonParser#file_import}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFile_import(minipythonParser.File_importContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link minipythonParser#member_import}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitMember_import(minipythonParser.Member_importContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link minipythonParser#statement}.
 	 * @param ctx the parse tree
