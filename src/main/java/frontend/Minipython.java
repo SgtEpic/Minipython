@@ -45,6 +45,17 @@ public class Minipython {
         // run interpreter
         //interpreter.interpret(stmts);
 
+        JFrame frame = new JFrame("Antlr CST");
+        JPanel panel = new JPanel();
+        TreeViewer viewer = new TreeViewer(Arrays.asList(
+            parser.getRuleNames()),cst);
+        viewer.setScale(1.5); // Scale a little
+        panel.add(viewer);
+        frame.add(panel);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.pack();
+        frame.setVisible(true);
+
         ProgramBuilder builder = new ProgramBuilder();
         Path fileOutput = java.nio.file.FileSystems.getDefault().getPath("compilerOutput");
         IntermediateCode code = new IntermediateCode(builder, fileOutput);
@@ -53,16 +64,7 @@ public class Minipython {
 
 
 
-     /*   JFrame frame = new JFrame("Antlr CST");
-        JPanel panel = new JPanel();
-        TreeViewer viewer = new TreeViewer(Arrays.asList(
-                parser.getRuleNames()),cst);
-        viewer.setScale(1.5); // Scale a little
-        panel.add(viewer);
-        frame.add(panel);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.pack();
-        frame.setVisible(true);*/
+
 
     }
 

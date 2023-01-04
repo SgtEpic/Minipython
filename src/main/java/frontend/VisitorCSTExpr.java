@@ -163,6 +163,17 @@ public class VisitorCSTExpr extends minipythonBaseVisitor<Expr> {
             return new Expr.Unary(symbol, visit(ctx.unary()));
         }
 
+        if (ctx.INCREMENT() != null) {
+            Symbol symbol = new Symbol(SymbolType.INCREMENT, ctx.INCREMENT().getText(), null, ctx.INCREMENT().getSymbol().getLine(), ctx.INCREMENT().getSymbol().getCharPositionInLine());
+            System.out.println(symbol);
+            return new Expr.Unary(symbol, visit(ctx.unary()));
+        }
+
+        if (ctx.DECREMENT() != null) {
+            Symbol symbol = new Symbol(SymbolType.DECREMENT, ctx.DECREMENT().getText(), null, ctx.DECREMENT().getSymbol().getLine(), ctx.DECREMENT().getSymbol().getCharPositionInLine());
+            return new Expr.Unary(symbol, visit(ctx.unary()));
+        }
+
         return visit(ctx.call());
     }
 

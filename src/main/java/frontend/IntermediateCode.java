@@ -296,10 +296,16 @@ public class IntermediateCode implements Expr.Visitor<Statement>, Stmt.Visitor<S
         expr.arguments.forEach(e -> expressions.add((Expression) e.accept(this)));
         return new SuperCall(expressions);
     }
+//    VariableDeclaration varD = new VariableDeclaration(expr.symbol.lexeme);
+//        builder.addVariable(varD);
+//    Reference r = new Reference(expr.symbol.lexeme);
+//    Expression e = (Expression) expr.value.accept(this);
+//    Statement s = new Assignment(r, e);
 
     @Override
     public Expression visitUnaryExpr(Expr.Unary expr) {
         Expression right = (Expression) expr.right.accept(this);
+
         switch(expr.operator.type) {
             case MINUS:
                 return new Call(new AttributeReference("__sub__", new IntLiteral(0)), List.of(right));
@@ -307,6 +313,12 @@ public class IntermediateCode implements Expr.Visitor<Statement>, Stmt.Visitor<S
                 return new Call(new AttributeReference("__add__", new IntLiteral(0)), List.of(right));
             case NOT:
                 return new NotKeyword(right);
+            case INCREMENT:
+                Statement s =  new Assignment((Reference) right, new Call(new AttributeReference("__add__", new IntLiteral(1)), List.of(right)));
+                builder.addStatement(s);
+                return (Expression) expr.right.accept(this);
+            case DECREMENT:
+                return new Call(new AttributeReference("__sub__", new IntLiteral(1)), List.of(right));
         }
         return null;
     }

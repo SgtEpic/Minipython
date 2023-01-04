@@ -1,39 +1,7 @@
-class A:
-    def __init__(self):
-        self.number = 6
-        print("hi from A")
-    #end
-#end
+i = 6
+c = ++i
+d = ++i
+print(i)
+print(c)
+print(d)
 
-class B(A):
-    def __init__(self):
-        super()
-        self.a = A()
-        print("hi from B")
-    #end
-    def add(self, a,b):
-        return a+b
-    #end
-#end
-
-class C(B):
-    def __init__(self):
-        super()
-        self.b = B()
-        print("hi from C")
-    #end
-#end
-
-class D(C):
-    def __init__(self):
-        super()
-        self.c = C()
-        print("hi from D")
-    #end
-#end
-
-
-d = D()
-d.c.b.a.number = 10
-print(d.c.b.a.number)
-print(d.add(100,100))

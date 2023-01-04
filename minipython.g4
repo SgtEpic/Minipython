@@ -35,7 +35,7 @@ equality: comparison ( ( EQ | NEQ ) equality )?;
 comparison: term ( ( LT | GT | LTE | GTE ) comparison )?;
 term: factor ( ( PLUS | MINUS ) term )?;
 factor: unary( ( STAR | DIVIDE ) factor )?;
-unary: ( NOT | PLUS | MINUS ) unary | call;
+unary: ( NOT | PLUS | MINUS ) unary | unary (INCREMENT|DECREMENT)| (INCREMENT|DECREMENT) unary| call;
 call: primary ( L_PAREN arguments? R_PAREN | DOT NAME)*;
 primary: NAME | NUMBER | STRING | TRUE | FALSE | L_PAREN expression R_PAREN | SUPER L_PAREN arguments? R_PAREN;
 
@@ -60,6 +60,8 @@ PLUS: '+';
 MINUS: '-';
 STAR: '*';
 DIVIDE: '/';
+INCREMENT: '++';
+DECREMENT: '--';
 NOT: 'not';
 SUPER: 'super';
 DOT: '.';
