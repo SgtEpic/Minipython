@@ -158,6 +158,26 @@ public interface minipythonListener extends ParseTreeListener {
 	 */
 	void exitAssignment(minipythonParser.AssignmentContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link minipythonParser#lambda}.
+	 * @param ctx the parse tree
+	 */
+	void enterLambda(minipythonParser.LambdaContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link minipythonParser#lambda}.
+	 * @param ctx the parse tree
+	 */
+	void exitLambda(minipythonParser.LambdaContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link minipythonParser#lambda_fn}.
+	 * @param ctx the parse tree
+	 */
+	void enterLambda_fn(minipythonParser.Lambda_fnContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link minipythonParser#lambda_fn}.
+	 * @param ctx the parse tree
+	 */
+	void exitLambda_fn(minipythonParser.Lambda_fnContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link minipythonParser#logic_or}.
 	 * @param ctx the parse tree
 	 */

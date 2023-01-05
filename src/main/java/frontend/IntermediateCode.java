@@ -3,6 +3,7 @@ package frontend;
 import CBuilder.Expression;
 import CBuilder.Statement;
 import CBuilder.ProgramBuilder;
+import CBuilder.conditions.IfExpression;
 import CBuilder.conditions.IfThenElseStatement;
 import CBuilder.conditions.conditionalStatement.ElifStatement;
 import CBuilder.conditions.conditionalStatement.ElseStatement;
@@ -29,6 +30,8 @@ public class IntermediateCode implements Expr.Visitor<Statement>, Stmt.Visitor<S
 
     ProgramBuilder builder;
     Path fileOutput;
+
+    int lambdaCounter = 1;
 
     IntermediateCode(ProgramBuilder programBuilder, Path fileOutput) {
         this.builder = programBuilder;
@@ -177,9 +180,10 @@ public class IntermediateCode implements Expr.Visitor<Statement>, Stmt.Visitor<S
 
     @Override
     public Statement visitAssignmentExpr(Expr.Assignment expr) {
-        // TODO fix variable declaration and assignment
-        VariableDeclaration varD = new VariableDeclaration(expr.symbol.lexeme);
-        builder.addVariable(varD);
+        if (expr.declaration) {
+            VariableDeclaration varD = new VariableDeclaration(expr.symbol.lexeme);
+            builder.addVariable(varD);
+        }
         Reference r = new Reference(expr.symbol.lexeme);
         Expression e = (Expression) expr.value.accept(this);
         Statement s = new Assignment(r, e);
@@ -227,6 +231,14 @@ public class IntermediateCode implements Expr.Visitor<Statement>, Stmt.Visitor<S
     }
 
     @Override
+    public Expression visitConditionExpr(Expr.Condition expr) {
+        Expression condition = (Expression) expr.condition.accept(this);
+        Expression thenBranch = (Expression) expr.thenBranch.accept(this);
+        Expression elseBranch = (Expression) expr.elseBranch.accept(this);
+        return new IfExpression(condition, thenBranch, elseBranch);
+    }
+
+    @Override
     public Expression visitGetExpr(Expr.Get expr) {
         Expression e = (Expression) expr.object.accept(this);
         return new AttributeReference(expr.symbol.lexeme, e);
@@ -235,6 +247,38 @@ public class IntermediateCode implements Expr.Visitor<Statement>, Stmt.Visitor<S
     @Override
     public Expression visitGroupingExpr(Expr.Grouping expr) {
         return (Expression) expr.expression.accept(this);
+    }
+
+    @Override
+    public Expression visitLambdaExpr(Expr.Lambda expr) {
+        // def anonymous function
+        String funName = "____mpy_lambda_" + lambdaCounter++;
+        Expression returnExpr = (Expression) expr.expr.accept(this);
+        Statement stmt = new ReturnStatement(returnExpr);
+
+/*
+        // check for condition
+        if (expr.condition != null) {
+            Expr.Condition condition = (Expr.Condition) expr.condition;
+            Expression conditionExpr = (Expression) condition.condition.accept(this);
+            Expression thenExpr = (Expression) condition.thenBranch.accept(this);
+            Expression elseExpr = (Expression) condition.elseBranch.accept(this);
+            Expression ifExpression = new IfExpression(conditionExpr, thenExpr, elseExpr);
+            stmt = new ReturnStatement(ifExpression);
+        }
+*/
+
+        // positional arguments
+        List<Argument> arguments = new ArrayList<>();
+        for (int i=0; i< expr.parameters.size(); i++) {
+            arguments.add(new Argument(expr.parameters.get(i).lexeme, i));
+        }
+
+        // add function def to builder
+        Function f = new Function(funName, List.of(stmt), arguments, List.of());
+        builder.addFunction(f);
+
+        return new Reference(funName);
     }
 
     @Override

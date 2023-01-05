@@ -118,6 +118,11 @@ public class AstPrinter implements Expr.Visitor<String>, Stmt.Visitor<String> {
     }
 
     @Override
+    public String visitConditionExpr(Expr.Condition expr) {
+        return null;
+    }
+
+    @Override
     public String visitGetExpr(Expr.Get expr) {
         return parenthesize2(".", expr.object, expr.symbol.lexeme);
     }
@@ -125,6 +130,11 @@ public class AstPrinter implements Expr.Visitor<String>, Stmt.Visitor<String> {
     @Override
     public String visitGroupingExpr(Expr.Grouping expr) {
         return parenthesize("group", expr.expression);
+    }
+
+    @Override
+    public String visitLambdaExpr(Expr.Lambda expr) {
+        return null;
     }
 
     @Override

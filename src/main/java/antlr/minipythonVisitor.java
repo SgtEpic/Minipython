@@ -101,6 +101,18 @@ public interface minipythonVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitAssignment(minipythonParser.AssignmentContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link minipythonParser#lambda}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLambda(minipythonParser.LambdaContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link minipythonParser#lambda_fn}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLambda_fn(minipythonParser.Lambda_fnContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link minipythonParser#logic_or}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
