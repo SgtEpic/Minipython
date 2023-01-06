@@ -5,6 +5,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import antlr.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class VisitorCSTExpr extends minipythonBaseVisitor<Expr> {
     @Override
@@ -51,7 +52,50 @@ public class VisitorCSTExpr extends minipythonBaseVisitor<Expr> {
 
         }
         // visit logic_or
-        return visit(ctx.logic_or());
+        return visit(ctx.lambda());
+    }
+
+    @Override
+    public Expr visitLambda(minipythonParser.LambdaContext ctx) {
+        // check for logic_or
+        if (ctx.logic_or().size() == 1) {
+            return visit(ctx.logic_or(0));
+        }
+        // check for condition expr
+        if (ctx.logic_or().size() > 1) {
+            Expr thenBranch = visit(ctx.logic_or(0));
+            Expr condition = visit(ctx.logic_or(1));
+            Expr elseBranch = visit(ctx.lambda());
+            return new Expr.Condition(condition, thenBranch, elseBranch);
+        }
+        // check for lambda expr
+        if (!ctx.lambda_fn().isEmpty()) {
+            return visit(ctx.lambda_fn());
+        }
+        return null;
+    }
+
+    @Override
+    public Expr visitLambda_fn(minipythonParser.Lambda_fnContext ctx) {
+        Expr.Lambda lambda;
+        // get params (args not supported)
+        List<Symbol> params = new ArrayList<>();
+        if (ctx.parameters() != null) {
+            for (int i = 0; i < ctx.parameters().name(0).NAME().size(); i++) {
+                params.add(new Symbol(SymbolType.NAME, ctx.parameters().name(i).NAME(0).getText(), null, ctx.parameters().name(i).NAME(0).getSymbol().getLine(), ctx.parameters().name(i).NAME(0).getSymbol().getCharPositionInLine()));
+            }
+        }
+/*
+        Expr condition = null;
+        // check for condition
+        if (ctx.lambda().IF() != null) {
+            condition = visit(ctx.lambda());
+        }
+*/
+        // get statement
+        Expr expr = visit(ctx.lambda());
+
+        return new Expr.Lambda(params, expr);
     }
 
     @Override

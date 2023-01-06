@@ -1,6 +1,7 @@
 package frontend;
 
 import java.util.List;
+import java.util.Optional;
 
 public abstract class Expr {
     int distance = -1;
@@ -8,8 +9,10 @@ public abstract class Expr {
         T visitAssignmentExpr(Assignment expr);
         T visitBinaryExpr(Binary expr);
         T visitCallExpr(Call expr);
+        T visitConditionExpr(Condition expr);
         T visitGetExpr(Get expr);
         T visitGroupingExpr(Grouping expr);
+        T visitLambdaExpr(Lambda expr);
         T visitLiteralExpr(Literal expr);
         T visitLogicalExpr(Logical expr);
         T visitSelfExpr(Self expr);
@@ -24,6 +27,7 @@ public abstract class Expr {
     static class Assignment extends Expr {
         final Symbol symbol;
         final Expr value;
+        Boolean declaration = false;
         Assignment(Symbol symbol, Expr value) {
             this.symbol = symbol;
             this.value = value;
@@ -67,6 +71,21 @@ public abstract class Expr {
          }
    }
 
+   static class Condition extends Expr {
+            final Expr condition;
+            final Expr thenBranch;
+            final Expr elseBranch;
+            Condition(Expr condition, Expr thenBranch, Expr elseBranch) {
+                this.condition = condition;
+                this.thenBranch = thenBranch;
+                this.elseBranch = elseBranch;
+            }
+            @Override
+            <T> T accept(Visitor<T> visitor) {
+                return visitor.visitConditionExpr(this);
+            }
+   }
+
    static class Get extends Expr {
          final Expr object;
          final Symbol symbol;
@@ -89,6 +108,20 @@ public abstract class Expr {
         @Override
         <T> T accept(Visitor<T> visitor) {
             return visitor.visitGroupingExpr(this);
+        }
+    }
+
+    static class Lambda extends Expr {
+        final List<Symbol> parameters;
+        final Expr expr;
+        Lambda(List<Symbol> parameters, Expr expr) {
+            this.parameters = parameters;
+            this.expr = expr;
+        }
+
+        @Override
+        <T> T accept(Visitor<T> visitor) {
+            return visitor.visitLambdaExpr(this);
         }
     }
 

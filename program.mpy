@@ -1,6 +1,6 @@
-import file_import
-from single_import import test
+def func(func_param):
+    print(func_param(1))
+#end
 
-print(add(1,3))
-print(CONSTANT)
-test()
+func(lambda x: x*2)
+

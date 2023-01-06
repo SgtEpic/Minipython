@@ -36,7 +36,9 @@ name: STAR? NAME (L_BRACKET (NUMBER | NAME) R_BRACKET)?;
 
 expression_stmt: expression;
 expression: assignment;
-assignment: (call DOT)? name ASSIGN assignment | logic_or;
+assignment: (call DOT)? name ASSIGN assignment | lambda;
+lambda: logic_or (IF logic_or ELSE lambda)? | lambda_fn;
+lambda_fn: LAMBDA parameters? COLON lambda;
 logic_or: logic_and (OR logic_or )?;
 logic_and: equality (AND logic_and )?;
 equality: comparison ( ( EQ | NEQ ) equality )?;
@@ -87,6 +89,7 @@ IF: 'if';
 ELIF: 'elif';
 ELSE: 'else';
 RETURN: 'return';
+LAMBDA: 'lambda';
 
 END: '#end';
 TRUE: 'True';
