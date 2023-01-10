@@ -81,8 +81,8 @@ public class VisitorCSTExpr extends minipythonBaseVisitor<Expr> {
         // get params (args not supported)
         List<Symbol> params = new ArrayList<>();
         if (ctx.parameters() != null) {
-            for (int i = 0; i < ctx.parameters().name(0).NAME().size(); i++) {
-                params.add(new Symbol(SymbolType.NAME, ctx.parameters().name(i).NAME(0).getText(), null, ctx.parameters().name(i).NAME(0).getSymbol().getLine(), ctx.parameters().name(i).NAME(0).getSymbol().getCharPositionInLine()));
+            for (int i = 0; i < ctx.parameters().name().size(); i++) {
+                params.add(new Symbol(SymbolType.NAME, ctx.parameters().name(i).getText(), null, ctx.parameters().name(i).NAME(0).getSymbol().getLine(), ctx.parameters().name(i).NAME(0).getSymbol().getCharPositionInLine()));
             }
         }
 /*
