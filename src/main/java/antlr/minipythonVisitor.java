@@ -173,6 +173,26 @@ public interface minipythonVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitFactor(minipythonParser.FactorContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link minipythonParser#not}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNot(minipythonParser.NotContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code PREFIX}
+	 * labeled alternative in {@link minipythonParser#inc_dec}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPREFIX(minipythonParser.PREFIXContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code POSTFIX}
+	 * labeled alternative in {@link minipythonParser#inc_dec}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPOSTFIX(minipythonParser.POSTFIXContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link minipythonParser#unary}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

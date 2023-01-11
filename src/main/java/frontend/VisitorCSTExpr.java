@@ -179,14 +179,46 @@ public class VisitorCSTExpr extends minipythonBaseVisitor<Expr> {
         // check for multiplication
         if (ctx.STAR() != null) {
             Symbol symbol = new Symbol(SymbolType.STAR, ctx.STAR().getText(), null, ctx.STAR().getSymbol().getLine(), ctx.STAR().getSymbol().getCharPositionInLine());
-            return new Expr.Binary(visit(ctx.unary()), symbol, visit(ctx.factor()));
+            return new Expr.Binary(visit(ctx.not()), symbol, visit(ctx.factor()));
         }
         // check for division
         if (ctx.DIVIDE() != null) {
             Symbol symbol = new Symbol(SymbolType.DIVIDE, ctx.DIVIDE().getText(), null, ctx.DIVIDE().getSymbol().getLine(), ctx.DIVIDE().getSymbol().getCharPositionInLine());
-            return new Expr.Binary(visit(ctx.unary()), symbol, visit(ctx.factor()));
+            return new Expr.Binary(visit(ctx.not()), symbol, visit(ctx.factor()));
+        }
+        return visit(ctx.not());
+    }
+
+    @Override
+    public Expr visitNot(minipythonParser.NotContext ctx) {
+        // check for not
+        if (ctx.NOT() != null) {
+            Symbol symbol = new Symbol(SymbolType.NOT, ctx.NOT().getText(), null, ctx.NOT().getSymbol().getLine(), ctx.NOT().getSymbol().getCharPositionInLine());
+            return new Expr.Unary(symbol, visit(ctx.not()));
         }
         return visit(ctx.unary());
+    }
+
+    @Override
+    public Expr visitPREFIX(minipythonParser.PREFIXContext ctx) {
+        if (ctx.INCREMENT() != null) {
+
+        }
+        if (ctx.DECREMENT() != null ) {
+
+        }
+        return null;
+    }
+
+    @Override
+    public Expr visitPOSTFIX(minipythonParser.POSTFIXContext ctx) {
+        if (ctx.INCREMENT() != null) {
+
+        }
+        if (ctx.DECREMENT() != null ) {
+
+        }
+        return null;
     }
 
     @Override
@@ -194,19 +226,13 @@ public class VisitorCSTExpr extends minipythonBaseVisitor<Expr> {
         // check for unary minus
         if (ctx.MINUS() != null) {
             Symbol symbol = new Symbol(SymbolType.MINUS, ctx.MINUS().getText(), null, ctx.MINUS().getSymbol().getLine(), ctx.MINUS().getSymbol().getCharPositionInLine());
-            return new Expr.Unary(symbol, visit(ctx.unary()));
+            return new Expr.Unary(symbol, visit(ctx.call()));
         }
         // check for unary plus
         if (ctx.PLUS() != null) {
             Symbol symbol = new Symbol(SymbolType.PLUS, ctx.PLUS().getText(), null, ctx.PLUS().getSymbol().getLine(), ctx.PLUS().getSymbol().getCharPositionInLine());
-            return new Expr.Unary(symbol, visit(ctx.unary()));
+            return new Expr.Unary(symbol, visit(ctx.call()));
         }
-        // check for not
-        if (ctx.NOT() != null) {
-            Symbol symbol = new Symbol(SymbolType.NOT, ctx.NOT().getText(), null, ctx.NOT().getSymbol().getLine(), ctx.NOT().getSymbol().getCharPositionInLine());
-            return new Expr.Unary(symbol, visit(ctx.unary()));
-        }
-
         return visit(ctx.call());
     }
 

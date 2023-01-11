@@ -36,7 +36,7 @@ name: STAR? NAME (L_BRACKET (NUMBER | NAME) R_BRACKET)?;
 
 expression_stmt: expression;
 expression: assignment;
-assignment: (call DOT)? name ASSIGN assignment | lambda;
+assignment: (call DOT)? name ASSIGN assignment | (call DOT)? NAME (ASSIGNPLUS | ASSINGMINUS | ASSIGNSTAR | ASSIGNDIVIDE) lambda | lambda;
 lambda: logic_or (IF logic_or ELSE lambda)? | lambda_fn;
 lambda_fn: LAMBDA parameters? COLON lambda;
 logic_or: logic_and (OR logic_or )?;
@@ -44,8 +44,11 @@ logic_and: equality (AND logic_and )?;
 equality: comparison ( ( EQ | NEQ ) equality )?;
 comparison: term ( ( LT | GT | LTE | GTE ) comparison )?;
 term: factor ( ( PLUS | MINUS ) term )?;
-factor: unary( ( STAR | DIVIDE ) factor )?;
-unary: ( NOT | PLUS | MINUS ) unary | call;
+factor: not( ( STAR | DIVIDE ) factor )?;
+not: NOT not | inc_dec | unary;
+inc_dec: (INCREMENT | DECREMENT) call # PREFIX
+        | call (INCREMENT | DECREMENT) # POSTFIX;
+unary: (PLUS | MINUS)? call;
 call: primary ( L_PAREN arguments? R_PAREN | DOT name)*;
 primary: list_expression | name | NUMBER | STRING | TRUE | FALSE | L_PAREN expression R_PAREN | SUPER L_PAREN arguments? R_PAREN;
 list_expression: L_BRACKET arguments? R_BRACKET;

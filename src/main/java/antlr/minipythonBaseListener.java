@@ -1,5 +1,6 @@
 // Generated from java-escape by ANTLR 4.11.1
 package antlr;
+
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -335,6 +336,42 @@ public class minipythonBaseListener implements minipythonListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitFactor(minipythonParser.FactorContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterNot(minipythonParser.NotContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitNot(minipythonParser.NotContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterPREFIX(minipythonParser.PREFIXContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitPREFIX(minipythonParser.PREFIXContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterPOSTFIX(minipythonParser.POSTFIXContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitPOSTFIX(minipythonParser.POSTFIXContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

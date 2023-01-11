@@ -278,6 +278,40 @@ public interface minipythonListener extends ParseTreeListener {
 	 */
 	void exitFactor(minipythonParser.FactorContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link minipythonParser#not}.
+	 * @param ctx the parse tree
+	 */
+	void enterNot(minipythonParser.NotContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link minipythonParser#not}.
+	 * @param ctx the parse tree
+	 */
+	void exitNot(minipythonParser.NotContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code PREFIX}
+	 * labeled alternative in {@link minipythonParser#inc_dec}.
+	 * @param ctx the parse tree
+	 */
+	void enterPREFIX(minipythonParser.PREFIXContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code PREFIX}
+	 * labeled alternative in {@link minipythonParser#inc_dec}.
+	 * @param ctx the parse tree
+	 */
+	void exitPREFIX(minipythonParser.PREFIXContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code POSTFIX}
+	 * labeled alternative in {@link minipythonParser#inc_dec}.
+	 * @param ctx the parse tree
+	 */
+	void enterPOSTFIX(minipythonParser.POSTFIXContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code POSTFIX}
+	 * labeled alternative in {@link minipythonParser#inc_dec}.
+	 * @param ctx the parse tree
+	 */
+	void exitPOSTFIX(minipythonParser.POSTFIXContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link minipythonParser#unary}.
 	 * @param ctx the parse tree
 	 */
