@@ -401,6 +401,18 @@ public class IntermediateCode implements Expr.Visitor<Statement>, Stmt.Visitor<S
                 return new Call(new AttributeReference("__add__", new IntLiteral(0)), List.of(right));
             case NOT:
                 return new NotKeyword(right);
+            case INCREMENT:
+                if (expr.postfix) {
+
+                } else {
+
+                }
+            case DECREMENT:
+                if (expr.postfix) {
+
+                } else {
+
+                }
         }
         return null;
     }

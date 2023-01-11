@@ -198,9 +198,17 @@ public abstract class Expr {
     static class Unary extends Expr {
         final Symbol operator;
         final Expr right;
+
+        Boolean postfix;
         Unary(Symbol operator, Expr right) {
             this.operator = operator;
             this.right = right;
+        }
+
+        Unary(Symbol operator, Expr right, Boolean postfix) {
+            this.operator = operator;
+            this.right = right;
+            this.postfix = postfix;
         }
 
         @Override
