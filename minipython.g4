@@ -36,7 +36,7 @@ name: STAR? NAME (L_BRACKET (NUMBER | NAME) R_BRACKET)?;
 
 expression_stmt: expression;
 expression: assignment;
-assignment: (call DOT)? name ASSIGN assignment | (call DOT)? NAME (ASSIGNPLUS | ASSINGMINUS | ASSIGNSTAR | ASSIGNDIVIDE) lambda | lambda;
+assignment: (call DOT)? name ASSIGN assignment | (call DOT)? NAME (ASSIGNPLUS | ASSIGNMINUS | ASSIGNSTAR | ASSIGNDIVIDE) lambda | lambda;
 lambda: logic_or (IF logic_or ELSE lambda)? | lambda_fn;
 lambda_fn: LAMBDA parameters? COLON lambda;
 logic_or: logic_and (OR logic_or )?;
@@ -61,6 +61,10 @@ COMMENT: ('#' ~[e] ~[\r\n]* '\r'? '\n'| '#' . ~[n] ~[\r\n]* '\r'? '\n' |'#' . . 
 //COMMENT: '#' .*? -> skip;
 
 ASSIGN: '=';
+ASSIGNPLUS: '+=';
+ASSIGNMINUS: '-=';
+ASSIGNSTAR: '*=';
+ASSIGNDIVIDE: '/=';
 OR: 'or';
 AND: 'and';
 EQ: '==';
@@ -73,6 +77,8 @@ PLUS: '+';
 MINUS: '-';
 STAR: '*';
 DIVIDE: '/';
+INCREMENT: '++';
+DECREMENT: '--';
 NOT: 'not';
 SUPER: 'super';
 DOT: '.';

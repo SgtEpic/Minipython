@@ -394,6 +394,7 @@ public class IntermediateCode implements Expr.Visitor<Statement>, Stmt.Visitor<S
     @Override
     public Expression visitUnaryExpr(Expr.Unary expr) {
         Expression right = (Expression) expr.right.accept(this);
+        Expr.Variable right_val = (Expr.Variable) expr.right;
         switch(expr.operator.type) {
             case MINUS:
                 return new Call(new AttributeReference("__sub__", new IntLiteral(0)), List.of(right));
@@ -403,15 +404,15 @@ public class IntermediateCode implements Expr.Visitor<Statement>, Stmt.Visitor<S
                 return new NotKeyword(right);
             case INCREMENT:
                 if (expr.postfix) {
-
+                    return new Call(new AttributeReference("__postinc__", new Reference(right_val.symbol.lexeme)), List.of());
                 } else {
-
+                    return new Call(new AttributeReference("__preinc__", new Reference(right_val.symbol.lexeme)), List.of());
                 }
             case DECREMENT:
                 if (expr.postfix) {
-
+                    return new Call(new AttributeReference("__postdec__", new Reference(right_val.symbol.lexeme)), List.of());
                 } else {
-
+                    return new Call(new AttributeReference("__predec__", new Reference(right_val.symbol.lexeme)), List.of());
                 }
         }
         return null;

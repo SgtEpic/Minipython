@@ -1,11 +1,12 @@
-def func(func_param):
-    print(func_param(1))
+i = 5
+i++
+a = ++i
+b = i--
+print(i)
+print(a)
+print(b)
+
+while(i):
+    print(i--)
+    print(i)
 #end
-
-func(lambda x: x*2)
-
-l = [1,2,3,4,5]
-out = l.reduce(lambda x,y: x+y)
-print(out)
-
-

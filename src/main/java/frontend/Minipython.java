@@ -2,11 +2,14 @@ package frontend;
 
 import CBuilder.ProgramBuilder;
 import antlr.*;
+import org.antlr.v4.gui.TreeViewer;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 
+import javax.swing.*;
 import java.nio.file.Path;
+import java.util.Arrays;
 
 public class Minipython {
 
@@ -26,15 +29,24 @@ public class Minipython {
         ParseTree list_cst = list_parser.program();
         ParseTree cst = parser.program(); // begin parsing at init rule
         System.out.println(cst.toStringTree(parser)); // print LISP-style tree
-
+//        JFrame frame = new JFrame("Antlr CST");
+//        JPanel panel = new JPanel();
+//        TreeViewer viewer = new TreeViewer(Arrays.asList(
+//            parser.getRuleNames()),cst);
+//        viewer.setScale(1.5); // Scale a little
+//        panel.add(viewer);
+//        frame.add(panel);
+//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//        frame.pack();
+//        frame.setVisible(true);
         VistorCST list_visitorCST = new VistorCST();
         VistorCST visitorCST = new VistorCST();
 
         // create AST
-        Stmt.Program list_ast = (Stmt.Program) list_visitorCST.visit(list_cst);
+//        Stmt.Program list_ast = (Stmt.Program) list_visitorCST.visit(list_cst);
         Stmt.Program ast = (Stmt.Program) visitorCST.visit(cst);
         // combine list ast and program ast
-        ast.statements.addAll(0, list_ast.statements);
+//        ast.statements.addAll(0, list_ast.statements);
 
         // visitor to print AST
         AstPrinter astVisitorPrinter = new AstPrinter();
@@ -58,16 +70,7 @@ public class Minipython {
 
 
 
-     /*   JFrame frame = new JFrame("Antlr CST");
-        JPanel panel = new JPanel();
-        TreeViewer viewer = new TreeViewer(Arrays.asList(
-                parser.getRuleNames()),cst);
-        viewer.setScale(1.5); // Scale a little
-        panel.add(viewer);
-        frame.add(panel);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.pack();
-        frame.setVisible(true);*/
+
 
     }
 

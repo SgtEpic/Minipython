@@ -43,6 +43,14 @@ extern __MPyObj *__MPyFunc_Int_bool;
 
 extern __MPyObj *__MPyFunc_Int_add;
 
+extern __MPyObj *__MPyFunc_Int_preinc;
+
+extern __MPyObj *__MPyFunc_Int_postinc;
+
+extern __MPyObj *__MPyFunc_Int_predec;
+
+extern __MPyObj *__MPyFunc_Int_postdec;
+
 extern __MPyObj *__MPyFunc_Int_sub;
 
 extern __MPyObj *__MPyFunc_Int_mul;

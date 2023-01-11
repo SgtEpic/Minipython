@@ -61,6 +61,14 @@ __MPyObj *__MPyFunc_Int_str;
 
 __MPyObj *__MPyFunc_Int_bool;
 
+__MPyObj *__MPyFunc_Int_preinc;
+
+__MPyObj *__MPyFunc_Int_postinc;
+
+__MPyObj *__MPyFunc_Int_predec;
+
+__MPyObj *__MPyFunc_Int_postdec;
+
 __MPyObj *__MPyFunc_Int_add;
 
 __MPyObj *__MPyFunc_Int_sub;
@@ -196,6 +204,14 @@ void __mpy_builtins_setup() {
     init_int_func(str);
 
     init_int_func(bool);
+
+    init_int_func(preinc);
+
+    init_int_func(postinc);
+
+    init_int_func(predec);
+
+    init_int_func(postdec);
 
     init_int_func(add);
 

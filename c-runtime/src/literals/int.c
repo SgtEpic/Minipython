@@ -61,6 +61,66 @@ __MPyObj *__mpy_int_func_bool_impl(__MPyObj *args, __MPyObj *kwargs) {
     return __mpy_obj_return(__mpy_obj_init_boolean(truth));
 }
 
+__MPyObj *__mpy_int_func_preinc_impl(__MPyObj *args, __MPyObj *kwargs) {
+    assert(args != NULL && kwargs != NULL);
+
+    __MPyGetArgsState argHelper = __mpy_args_init("int.__preinc__", args, kwargs, 1);
+    __MPyObj *self = __mpy_args_get_positional(&argHelper, 0, "self");
+    __mpy_args_finish(&argHelper);
+
+    __mpy_int_c_type value = ((MPyIntContent*)self->content)->value;
+    value++;
+
+    ((MPyIntContent*)self->content)->value = value;
+    __mpy_obj_ref_dec(self);
+    return __mpy_obj_return(__mpy_obj_init_int(value));
+}
+
+__MPyObj *__mpy_int_func_postinc_impl(__MPyObj *args, __MPyObj *kwargs) {
+    assert(args != NULL && kwargs != NULL);
+
+    __MPyGetArgsState argHelper = __mpy_args_init("int.__postinc__", args, kwargs, 1);
+    __MPyObj *self = __mpy_args_get_positional(&argHelper, 0, "self");
+    __mpy_args_finish(&argHelper);
+
+    __mpy_int_c_type value = ((MPyIntContent*)self->content)->value;
+    __mpy_int_c_type new_value = value + 1;
+
+    ((MPyIntContent*)self->content)->value = new_value;
+    __mpy_obj_ref_dec(self);
+    return __mpy_obj_return(__mpy_obj_init_int(value));
+}
+
+__MPyObj *__mpy_int_func_predec_impl(__MPyObj *args, __MPyObj *kwargs) {
+    assert(args != NULL && kwargs != NULL);
+
+    __MPyGetArgsState argHelper = __mpy_args_init("int.__predec__", args, kwargs, 1);
+    __MPyObj *self = __mpy_args_get_positional(&argHelper, 0, "self");
+    __mpy_args_finish(&argHelper);
+
+    __mpy_int_c_type value = ((MPyIntContent*)self->content)->value;
+    value--;
+
+    ((MPyIntContent*)self->content)->value = value;
+    __mpy_obj_ref_dec(self);
+    return __mpy_obj_return(__mpy_obj_init_int(value));
+}
+
+__MPyObj *__mpy_int_func_postdec_impl(__MPyObj *args, __MPyObj *kwargs) {
+    assert(args != NULL && kwargs != NULL);
+
+    __MPyGetArgsState argHelper = __mpy_args_init("int.__postdec__", args, kwargs, 1);
+    __MPyObj *self = __mpy_args_get_positional(&argHelper, 0, "self");
+    __mpy_args_finish(&argHelper);
+
+    __mpy_int_c_type value = ((MPyIntContent*)self->content)->value;
+    __mpy_int_c_type new_value = value - 1;
+
+    ((MPyIntContent*)self->content)->value = new_value;
+    __mpy_obj_ref_dec(self);
+    return __mpy_obj_return(__mpy_obj_init_int(value));
+}
+
 #define int_binary_calc(name, calc) \
 __MPyObj *__mpy_int_func_ ## name ## _impl(__MPyObj *args, __MPyObj *kwargs) { \
     assert(args != NULL && kwargs != NULL); \
@@ -127,7 +187,10 @@ __MPyObj* __mpy_int_get_attr_impl(__MPyObj *self, const char *name) {
 
     builtin_method(str);
     builtin_method(bool);
-
+    builtin_method(preinc);
+    builtin_method(postinc);
+    builtin_method(predec);
+    builtin_method(postdec);
     builtin_method(add);
     builtin_method(sub);
     builtin_method(mul);
@@ -170,6 +233,10 @@ __MPyObj* __mpy_obj_init_int(__mpy_int_c_type value) {
 #define bind_builtin(purpose) content->purpose ## Method = __mpy_bind_func(__MPyFunc_Int_ ## purpose, obj);
     bind_builtin(str);
     bind_builtin(bool);
+    bind_builtin(preinc);
+    bind_builtin(postinc);
+    bind_builtin(predec);
+    bind_builtin(postdec);
     bind_builtin(add);
     bind_builtin(sub);
     bind_builtin(mul);

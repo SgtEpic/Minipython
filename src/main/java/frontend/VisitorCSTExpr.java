@@ -196,6 +196,9 @@ public class VisitorCSTExpr extends minipythonBaseVisitor<Expr> {
             Symbol symbol = new Symbol(SymbolType.NOT, ctx.NOT().getText(), null, ctx.NOT().getSymbol().getLine(), ctx.NOT().getSymbol().getCharPositionInLine());
             return new Expr.Unary(symbol, visit(ctx.not()));
         }
+        if(ctx.inc_dec() != null){
+            return visit(ctx.inc_dec());
+        }
         return visit(ctx.unary());
     }
 
@@ -206,7 +209,7 @@ public class VisitorCSTExpr extends minipythonBaseVisitor<Expr> {
             return new Expr.Unary(symbol, visit(ctx.call()), false);
         }
         if (ctx.DECREMENT() != null ) {
-            Symbol symbol = new Symbol(SymbolType.DECREMENT, ctx.INCREMENT().getText(), "--", ctx.INCREMENT().getSymbol().getLine(), ctx.INCREMENT().getSymbol().getCharPositionInLine());
+            Symbol symbol = new Symbol(SymbolType.DECREMENT, ctx.DECREMENT().getText(), "--", ctx.DECREMENT().getSymbol().getLine(), ctx.DECREMENT().getSymbol().getCharPositionInLine());
             return new Expr.Unary(symbol, visit(ctx.call()), false);
         }
         return null;
@@ -219,7 +222,7 @@ public class VisitorCSTExpr extends minipythonBaseVisitor<Expr> {
             return new Expr.Unary(symbol, visit(ctx.call()), true);
         }
         if (ctx.DECREMENT() != null ) {
-            Symbol symbol = new Symbol(SymbolType.DECREMENT, ctx.INCREMENT().getText(), "--", ctx.INCREMENT().getSymbol().getLine(), ctx.INCREMENT().getSymbol().getCharPositionInLine());
+            Symbol symbol = new Symbol(SymbolType.DECREMENT, ctx.DECREMENT().getText(), "--", ctx.DECREMENT().getSymbol().getLine(), ctx.DECREMENT().getSymbol().getCharPositionInLine());
             return new Expr.Unary(symbol, visit(ctx.call()), true);
         }
         return null;

@@ -9,6 +9,10 @@ typedef struct MPyIntContent {
     __mpy_int_c_type value;
     __MPyObj *strMethod;
     __MPyObj *boolMethod;
+    __MPyObj *preincMethod;
+    __MPyObj *postincMethod;
+    __MPyObj *predecMethod;
+    __MPyObj *postdecMethod;
     __MPyObj *addMethod;
     __MPyObj *subMethod;
     __MPyObj *mulMethod;
@@ -32,6 +36,14 @@ __MPyObj* __mpy_obj_init_int(__mpy_int_c_type value);
 __MPyObj* __mpy_int_func_str_impl(__MPyObj *args, __MPyObj *kwargs);
 
 __MPyObj* __mpy_int_func_bool_impl(__MPyObj *args, __MPyObj *kwargs);
+
+__MPyObj *__mpy_int_func_preinc_impl(__MPyObj *args, __MPyObj *kwargs);
+
+__MPyObj *__mpy_int_func_postinc_impl(__MPyObj *args, __MPyObj *kwargs);
+
+__MPyObj *__mpy_int_func_predec_impl(__MPyObj *args, __MPyObj *kwargs);
+
+__MPyObj *__mpy_int_func_postdec_impl(__MPyObj *args, __MPyObj *kwargs);
 
 __MPyObj* __mpy_int_func_add_impl(__MPyObj *args, __MPyObj *kwargs);
 
