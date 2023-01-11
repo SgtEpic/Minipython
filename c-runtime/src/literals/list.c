@@ -219,8 +219,8 @@ void remove_at_index(__MPyObj *head, __MPyObj *self, __mpy_int_c_type index, int
         }
         return;
     }
-    if(current_index-1 != index){
-        get_value_at_index(head, content->next, index, current_index+1);
+    if(current_index+1 != index){
+        remove_at_index(head, content->next, index, current_index+1);
         return;
     }
     if(content->next == NULL){
@@ -295,6 +295,7 @@ void append_rec(__MPyObj *self, __MPyObj *value){
 
     if(content->value == NULL){
         content->value = value;
+        printf("here\n");
         return;
     }
 

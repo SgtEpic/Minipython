@@ -171,7 +171,9 @@ public class IntermediateCode implements Expr.Visitor<Statement>, Stmt.Visitor<S
 
         // else stmt
         List<Statement> elseBody = new ArrayList<>();
-        stmt.elseBranch.statements.forEach(statement -> elseBody.add(statement.accept(this)));
+        if(stmt.elseBranch != null){
+            stmt.elseBranch.statements.forEach(statement -> elseBody.add(statement.accept(this)));
+        }
         ElseStatement elseStmt = new ElseStatement(elseBody);
 
         return new IfThenElseStatement(ifStmt, Optional.of(elifStatements), Optional.of(elseStmt));

@@ -37,13 +37,11 @@ class List:
         while index < len(self):
             element = self.get(index)
             if element == item:
+                print(index)
                 self.removeIndex(index)
                 return element
-            else:
-                # this is just here because the code currently needs an else statement. Should be fixed later
-                i = 0
             #end
-            index = index + 1
+            index++
         #end
     #end
 
@@ -65,11 +63,8 @@ class List:
             element = self.get(index)
             if element == item:
                 return index
-            else:
-                # this is just here because the code currently needs an else statement. Should be fixed later
-                i = 0
             #end
-            index = index + 1
+            index++
         #end
     #end
 
@@ -79,12 +74,9 @@ class List:
         while index < len(self):
             element = self.get(index)
             if element == item:
-                amount = amount + 1
-            else:
-                # this is just here because the code currently needs an else statement. Should be fixed later
-                i = 0
+                amount++
             #end
-            index = index + 1
+            index++
         #end
         return amount
     #end
@@ -95,7 +87,7 @@ class List:
         while index < len(self):
             element = self.get(index)
             new_list.append(element)
-            index = index + 1
+            index++
         #end
         return new_list
     #end
@@ -105,8 +97,9 @@ class List:
         index = 0
         while index < len(self):
             element = self.get(index)
+            print(element)
             string = string + element.__str__() + " "
-            index = index + 1
+            index++
         #end
         string = string + "]"
         return string
@@ -119,10 +112,8 @@ class List:
             element = self.get(index)
             if filter_func(element):
                 new_list.append(element)
-            else:
-                i = 0
             #end
-            index = index + 1
+            index++
         #end
         return new_list
     #end
@@ -133,7 +124,7 @@ class List:
         while index < len(self):
             element = self.get(index)
             new_list.append(map_func(element))
-            index = index + 1
+            index++
         #end
         return new_list
     #end
@@ -144,7 +135,7 @@ class List:
         while index < len(self):
             right_element = self.get(index)
             left_element = reduce_func(left_element, right_element)
-            index = index + 1
+            index++
         #end
         return left_element
     #end
@@ -157,10 +148,8 @@ def filter(filter_func, list):
             element = list.get(index)
             if filter_func(element):
                 new_list.append(element)
-            else:
-                i = 0
             #end
-            index = index + 1
+            index++
         #end
         return new_list
     #end
@@ -171,7 +160,7 @@ def filter(filter_func, list):
         while index < len(list):
             element = list.get(index)
             new_list.append(map_func(element))
-            index = index + 1
+            index++
         #end
         return new_list
     #end
@@ -182,7 +171,7 @@ def filter(filter_func, list):
         while index < len(list):
             right_element = list.get(index)
             left_element = reduce_func(left_element, right_element)
-            index = index + 1
+            index++
         #end
         return left_element
     #end
