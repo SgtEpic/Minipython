@@ -6,7 +6,7 @@ public enum SymbolType {
     COMMA, DOT, MINUS, PLUS, STAR, DIVIDE, INCREMENT, DECREMENT,
 
     // One or two character tokens.
-    LT, GT, LTE, GTE, EQ, NEQ, ASSIGN,
+    LT, GT, LTE, GTE, EQ, NEQ, ASSIGN, ASSIGNPLUS, ASSIGNMINUS, ASSIGNSTAR, ASSIGNDIVIDE,
 
     // Literals.
     NAME, STRING, NUMBER,

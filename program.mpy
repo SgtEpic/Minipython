@@ -1,12 +1,21 @@
-i = 5
-i++
-a = ++i
-b = i--
-print(i)
-print(a)
-print(b)
-
-while(i):
-    print(i--)
-    print(i)
+class A:
+    def __init__(self):
+        self.name = "name"
+        self.age = 3
+    #end
+    def myfunc(self,a):
+        return a
+    #end
 #end
+
+a = A()
+a.age = a.age + 9
+a.age += 9
+c = 6
+c -= a.age
+
+print(a.age)
+print(c)
+a.age = a.myfunc(5)
+print(a.age)
+

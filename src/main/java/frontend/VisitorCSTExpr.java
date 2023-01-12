@@ -5,7 +5,6 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import antlr.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class VisitorCSTExpr extends minipythonBaseVisitor<Expr> {
     @Override
@@ -16,43 +15,105 @@ public class VisitorCSTExpr extends minipythonBaseVisitor<Expr> {
     @Override
     public Expr visitAssignment(minipythonParser.AssignmentContext ctx) {
         // check for assignment
-        if (ctx.ASSIGN() != null) {
+        if (ctx.ASSIGN() != null || ctx.ASSIGNPLUS() != null ||  ctx.ASSIGNMINUS() != null
+            ||ctx.ASSIGNSTAR() != null ||ctx.ASSIGNDIVIDE() != null) {
             // get lvalue of assignment
-            Expr value = visit(ctx.assignment());
+            Expr value;
+            if(ctx.assignment() != null){
+                value = visit(ctx.assignment());
+            }else{
+                value = visit(ctx.lambda());
+            }
             // check for call assignment
             if (ctx.call() != null) {
                 Expr expr = visit(ctx.call());
-                Symbol symbol = new Symbol(SymbolType.NAME, ctx.name().getText(), null, ctx.name().NAME(0).getSymbol().getLine(), ctx.name().NAME(0).getSymbol().getCharPositionInLine());
+                Symbol symbol;
+                if(ctx.assignment() != null){
+                    symbol = new Symbol(SymbolType.NAME, ctx.name().getText(), null, ctx.name().NAME(0).getSymbol().getLine(), ctx.name().NAME(0).getSymbol().getCharPositionInLine());
+                }else{
+                    symbol= new Symbol(SymbolType.NAME, ctx.NAME().getText(), null, ctx.NAME().getSymbol().getLine(), ctx.NAME().getSymbol().getCharPositionInLine());
+                }
+
                 if (expr instanceof Expr.Get) {
                     Expr.Get g = (Expr.Get) expr;
                     // chain last getter
                     Expr.Get get = new Expr.Get(g, symbol);
                     // create setter from getter
-                    return new Expr.Set(get.object, get.symbol, value);
+                    return new Expr.Set(get.object, get.symbol, determineValueForCallAssignment(ctx, value, get));
                 } else if (expr instanceof Expr.Variable) {
                     Expr.Variable v = (Expr.Variable) expr;
                     // create getter from variable
                     Expr.Get get = new Expr.Get(v, symbol);
                     // create setter from getter
-                    return new Expr.Set(get.object, get.symbol, value);
+                    return new Expr.Set(get.object, get.symbol, determineValueForCallAssignment(ctx, value, get));
                 } else if (expr instanceof Expr.Self) {
                     Expr.Self s = (Expr.Self) expr;
                     // create getter from self
                     Expr.Get get = new Expr.Get(s, symbol);
                     // create setter from getter
-                    return new Expr.Set(get.object, get.symbol, value);
+                    return new Expr.Set(get.object, get.symbol, determineValueForCallAssignment(ctx, value, get));
                 }
                 // TODO throw error
             }
             // no call -> simple assignment
             else {
-                Symbol t = new Symbol(SymbolType.NAME, ctx.name().getText(), null, ctx.name().NAME(0).getSymbol().getLine(), ctx.name().NAME(0).getSymbol().getCharPositionInLine());
-                return new Expr.Assignment(t, value);
+                Symbol t;
+                if(ctx.assignment() != null){
+                    t = new Symbol(SymbolType.NAME, ctx.name().getText(), null, ctx.name().NAME(0).getSymbol().getLine(), ctx.name().NAME(0).getSymbol().getCharPositionInLine());
+                }else{
+                    t = new Symbol(SymbolType.NAME, ctx.NAME().getText(), null, ctx.NAME().getSymbol().getLine(), ctx.NAME().getSymbol().getCharPositionInLine());
+                }
+
+                return new Expr.Assignment(t, determineValueForStandardAssignment(ctx, value));
             }
+
 
         }
         // visit logic_or
         return visit(ctx.lambda());
+    }
+
+    //depending on ctx a binary is built as value, example a+=5 becomes a = a+5
+    public Expr determineValueForStandardAssignment(minipythonParser.AssignmentContext ctx, Expr value){
+        if(ctx.ASSIGNPLUS() != null){
+                return new Expr.Binary(new Expr.Variable(new Symbol(SymbolType.NAME, ctx.NAME().getText(),null, ctx.NAME().getSymbol().getLine(), ctx.NAME().getSymbol().getCharPositionInLine())),
+                    new Symbol(SymbolType.PLUS, ctx.ASSIGNPLUS().getText(), null, ctx.ASSIGNPLUS().getSymbol().getLine(), ctx.ASSIGNPLUS().getSymbol().getCharPositionInLine()),
+                    value);
+        } else if(ctx.ASSIGNMINUS() != null){
+                return new Expr.Binary(new Expr.Variable(new Symbol(SymbolType.NAME, ctx.NAME().getText(),null, ctx.NAME().getSymbol().getLine(), ctx.NAME().getSymbol().getCharPositionInLine())),
+                    new Symbol(SymbolType.MINUS, ctx.ASSIGNMINUS().getText(), null, ctx.ASSIGNMINUS().getSymbol().getLine(), ctx.ASSIGNMINUS().getSymbol().getCharPositionInLine()),
+                    value);
+        }else if(ctx.ASSIGNSTAR() != null){
+            return new Expr.Binary(new Expr.Variable(new Symbol(SymbolType.NAME, ctx.NAME().getText(),null, ctx.NAME().getSymbol().getLine(), ctx.NAME().getSymbol().getCharPositionInLine())),
+                    new Symbol(SymbolType.STAR, ctx.ASSIGNSTAR().getText(), null, ctx.ASSIGNSTAR().getSymbol().getLine(), ctx.ASSIGNSTAR().getSymbol().getCharPositionInLine()),
+                    value);
+        }else if(ctx.ASSIGNDIVIDE() != null){
+            return new Expr.Binary(new Expr.Variable(new Symbol(SymbolType.NAME, ctx.NAME().getText(),null, ctx.NAME().getSymbol().getLine(), ctx.NAME().getSymbol().getCharPositionInLine())),
+                    new Symbol(SymbolType.DIVIDE, ctx.ASSIGNDIVIDE().getText(), null, ctx.ASSIGNDIVIDE().getSymbol().getLine(), ctx.ASSIGNDIVIDE().getSymbol().getCharPositionInLine()),
+                    value);
+        }
+        return value;
+    }
+
+    public Expr determineValueForCallAssignment(minipythonParser.AssignmentContext ctx, Expr value, Expr getExpression){
+        if(ctx.ASSIGNPLUS() != null){
+            return new Expr.Binary(getExpression,
+                new Symbol(SymbolType.PLUS, ctx.ASSIGNPLUS().getText(), null, ctx.ASSIGNPLUS().getSymbol().getLine(), ctx.ASSIGNPLUS().getSymbol().getCharPositionInLine()),
+                value);
+        } else if(ctx.ASSIGNMINUS() != null){
+            return new Expr.Binary(getExpression,
+                new Symbol(SymbolType.MINUS, ctx.ASSIGNMINUS().getText(), null, ctx.ASSIGNMINUS().getSymbol().getLine(), ctx.ASSIGNMINUS().getSymbol().getCharPositionInLine()),
+                value);
+        }else if(ctx.ASSIGNSTAR() != null){
+            return new Expr.Binary(getExpression,
+                new Symbol(SymbolType.STAR, ctx.ASSIGNSTAR().getText(), null, ctx.ASSIGNSTAR().getSymbol().getLine(), ctx.ASSIGNSTAR().getSymbol().getCharPositionInLine()),
+                value);
+        }else if(ctx.ASSIGNDIVIDE() != null){
+            return new Expr.Binary(getExpression,
+                new Symbol(SymbolType.DIVIDE, ctx.ASSIGNDIVIDE().getText(), null, ctx.ASSIGNDIVIDE().getSymbol().getLine(), ctx.ASSIGNDIVIDE().getSymbol().getCharPositionInLine()),
+                value);
+        }
+        return value;
     }
 
     @Override

@@ -39,6 +39,16 @@ public class Minipython {
         // combine list ast and program ast
         ast.statements.addAll(0, list_ast.statements);
 
+        JFrame frame = new JFrame("Antlr CST");
+        JPanel panel = new JPanel();
+        TreeViewer viewer = new TreeViewer(Arrays.asList(
+            parser.getRuleNames()),cst);
+        viewer.setScale(1.5); // Scale a little
+        panel.add(viewer);
+        frame.add(panel);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.pack();
+        frame.setVisible(true);
         // visitor to print AST
         AstPrinter astVisitorPrinter = new AstPrinter();
         // print statements of the program
@@ -59,16 +69,7 @@ public class Minipython {
         code.generateProgram(ast);
 
 
-        //        JFrame frame = new JFrame("Antlr CST");
-//        JPanel panel = new JPanel();
-//        TreeViewer viewer = new TreeViewer(Arrays.asList(
-//            parser.getRuleNames()),cst);
-//        viewer.setScale(1.5); // Scale a little
-//        panel.add(viewer);
-//        frame.add(panel);
-//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//        frame.pack();
-//        frame.setVisible(true);
+
 
     }
 
