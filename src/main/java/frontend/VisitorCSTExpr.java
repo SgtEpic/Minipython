@@ -73,7 +73,7 @@ public class VisitorCSTExpr extends minipythonBaseVisitor<Expr> {
         return visit(ctx.lambda());
     }
 
-    //depending on ctx a binary is built as value, example a+=5 becomes a = a+5
+    //depending on ctx a binary is built as value, for example a+=5 becomes a = a+5
     public Expr determineValueForStandardAssignment(minipythonParser.AssignmentContext ctx, Expr value){
         if(ctx.ASSIGNPLUS() != null){
                 return new Expr.Binary(new Expr.Variable(new Symbol(SymbolType.NAME, ctx.NAME().getText(),null, ctx.NAME().getSymbol().getLine(), ctx.NAME().getSymbol().getCharPositionInLine())),
@@ -94,7 +94,7 @@ public class VisitorCSTExpr extends minipythonBaseVisitor<Expr> {
         }
         return value;
     }
-
+    //depending on ctx a binary is built as value, for example a.age+=5 becomes a.age = a.age+5
     public Expr determineValueForCallAssignment(minipythonParser.AssignmentContext ctx, Expr value, Expr getExpression){
         if(ctx.ASSIGNPLUS() != null){
             return new Expr.Binary(getExpression,
