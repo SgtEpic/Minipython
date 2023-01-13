@@ -37,7 +37,6 @@ class List:
         while index < len(self):
             element = self.get(index)
             if element == item:
-                print(index)
                 self.removeIndex(index)
                 return element
             #end

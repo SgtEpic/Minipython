@@ -295,7 +295,6 @@ void append_rec(__MPyObj *self, __MPyObj *value){
 
     if(content->value == NULL){
         content->value = value;
-        printf("here\n");
         return;
     }
 
