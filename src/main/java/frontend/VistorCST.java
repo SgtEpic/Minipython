@@ -141,13 +141,91 @@ public class VistorCST extends minipythonBaseVisitor<Stmt> {
     public Stmt visitFuncdef(minipythonParser.FuncdefContext ctx) {
         Symbol name = new Symbol(SymbolType.NAME, ctx.NAME().getText(), null, ctx.NAME().getSymbol().getLine(), ctx.NAME().getSymbol().getCharPositionInLine());
         List<Symbol> params = new ArrayList<>();
+        List<String> paramsName = new ArrayList<>();
         if (ctx.parameters() != null) {
             for (int i = 0; i < ctx.parameters().name().size(); i++) {
                 params.add(new Symbol(SymbolType.NAME, ctx.parameters().name(i).getText(), null, ctx.parameters().name(i).NAME(0).getSymbol().getLine(), ctx.parameters().name(i).NAME(0).getSymbol().getCharPositionInLine()));
+                paramsName.add(ctx.parameters().name(i).getText());
             }
         }
         Stmt.Block block = (Stmt.Block) visit(ctx.block());
-        return new Stmt.Function(name, params, block);
+
+        List<String> localVariables = new ArrayList<>();
+        Expr.Lambda lambda = null;
+        for (Stmt statement : block.statements) {
+            if (statement instanceof Stmt.Return) {
+                Stmt.Return ret = (Stmt.Return) statement;
+                if (ret.value instanceof Expr.Lambda) {
+                    lambda = (Expr.Lambda) ret.value;
+                }
+            }
+            if (statement instanceof Stmt.Expression) {
+                Stmt.Expression expr = (Stmt.Expression) statement;
+                if (expr.expression instanceof Expr.Assignment) {
+                    Expr.Assignment assignment = (Expr.Assignment) expr.expression;
+                    if (assignment.value instanceof Expr.Lambda) {
+                        lambda = (Expr.Lambda) assignment.value;
+                    }
+                }
+            }
+        }
+
+
+
+        for (Stmt statement: block.statements) {
+            if(statement instanceof Stmt.Expression) {
+                Stmt.Expression expr = (Stmt.Expression) statement;
+                if(expr.expression instanceof Expr.Assignment ){
+                    Expr.Assignment assignment = (Expr.Assignment) expr.expression;
+                    // check if variable already declared as assignment or parameter
+                    if (!localVariables.contains(assignment.symbol.lexeme) && !paramsName.contains(assignment.symbol.lexeme)) {
+                        localVariables.add(assignment.symbol.lexeme);
+                    }
+                  /*  if (lambda != null) {
+                        lambda.localAssignments.add(assignment);
+                    }*/
+                }
+            }
+        }
+
+        // copy lambda assignments till lambda expression occurs
+        for (Stmt statement: block.statements) {
+            if (statement instanceof Stmt.Return) {
+                Stmt.Return ret = (Stmt.Return) statement;
+                if (ret.value instanceof Expr.Lambda) {
+                    break;
+                }
+            }
+            if (statement instanceof Stmt.Expression) {
+                Stmt.Expression expr = (Stmt.Expression) statement;
+                if (expr.expression instanceof Expr.Assignment) {
+                    Expr.Assignment assignment = (Expr.Assignment) expr.expression;
+                    if (assignment.value instanceof Expr.Lambda) {
+                        break;
+                    }
+                }
+            }
+            if (statement instanceof Stmt.Function) {
+                continue;
+            }
+            if (statement instanceof Stmt.Class) {
+                continue;
+            }
+            if (lambda != null) {
+                lambda.localAssignments.add(statement);
+            }
+        }
+
+        if (lambda != null) {
+            lambda.enclosingFuncName = name;
+        }
+        for (Symbol param: params) {
+            if (lambda != null) {
+                lambda.enclosingFuncParams.add(param);
+            }
+        }
+
+        return new Stmt.Function(name, params, block, localVariables);
     }
 
     @Override

@@ -61,4 +61,8 @@ public class Call implements Expression {
         return "__mpy_obj_ref_dec(" + buildExpression() + ");\n";
     }
 
+    public List<Expression> getArguments() {
+        return args;
+    }
+
 }

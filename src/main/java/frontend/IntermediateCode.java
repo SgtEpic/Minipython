@@ -37,6 +37,8 @@ public class IntermediateCode implements Expr.Visitor<Statement>, Stmt.Visitor<S
     List<Statement> statements = new ArrayList<>();
     int lambdaCounter = 1;
 
+    Map<String, List<Expression>> functionMap = new HashMap<>();
+
     IntermediateCode(ProgramBuilder programBuilder, Path fileOutput) {
         this.builder = programBuilder;
         this.fileOutput = fileOutput;
@@ -149,6 +151,10 @@ public class IntermediateCode implements Expr.Visitor<Statement>, Stmt.Visitor<S
         stmt.block.statements.forEach(statement -> body.add(statement.accept(this)));
 
         List<VariableDeclaration> localVariables = new ArrayList<>();
+        stmt.localDeclarations.forEach(name -> {
+            localVariables.add(new VariableDeclaration(name));
+        });
+
         return new Function(stmt.symbol.lexeme, body, arguments, localVariables);
     }
 
@@ -214,6 +220,10 @@ public class IntermediateCode implements Expr.Visitor<Statement>, Stmt.Visitor<S
         }
         Reference r = new Reference(expr.symbol.lexeme);
         Expression e = (Expression) expr.value.accept(this);
+        if (e instanceof Call) {
+            Call c = (Call) e;
+            functionMap.put(expr.symbol.lexeme, c.getArguments());
+        }
         Statement s = new Assignment(r, e);
         return s;
     }
@@ -279,6 +289,24 @@ public class IntermediateCode implements Expr.Visitor<Statement>, Stmt.Visitor<S
         for (Expr argument : expr.arguments) {
             arguments.add((Expression)argument.accept(this));
         }
+        // return lambda
+        if (callee instanceof Call) {
+            Call call = (Call) callee;
+            for (Expression argument : call.getArguments()) {
+                arguments.add(argument);
+            }
+        }
+        // assign lambda to variable
+        if (callee instanceof Reference) {
+            Reference reference = (Reference) callee;
+            System.out.println(reference.getName());
+            List<Expression> args = functionMap.get(reference.getName());
+            if (args != null) {
+                for (Expression argument : args) {
+                    arguments.add(argument);
+                }
+            }
+        }
         return new Call(callee, arguments);
     }
 
@@ -306,7 +334,37 @@ public class IntermediateCode implements Expr.Visitor<Statement>, Stmt.Visitor<S
         // def anonymous function
         String funName = "____mpy_lambda_" + lambdaCounter++;
         Expression returnExpr = (Expression) expr.expr.accept(this);
-        Statement stmt = new ReturnStatement(returnExpr);
+        List<Statement> statements = new ArrayList<>();
+        List<VariableDeclaration> localDeclarations = new ArrayList<>();
+        List<String> names = new ArrayList<>();
+        List<String> enclosingParamNames = new ArrayList<>();
+        for (Symbol p: expr.enclosingFuncParams) {
+            enclosingParamNames.add(p.lexeme);
+        }
+/*
+        for (Expr.Assignment a : expr.localAssignments) {
+            statements.add(a.accept(this));
+            if (!names.contains(a.symbol.lexeme) && !enclosingParamNames.contains(a.symbol.lexeme)) {
+                localDeclarations.add(new VariableDeclaration(a.symbol.lexeme));
+                names.add(a.symbol.lexeme);
+            }
+        }
+*/
+        for (Stmt s : expr.localAssignments) {
+            statements.add(s.accept(this));
+            if (s instanceof Stmt.Expression) {
+                Stmt.Expression e = (Stmt.Expression) s;
+                if (e.expression instanceof Expr.Assignment) {
+                    Expr.Assignment a = (Expr.Assignment) e.expression;
+                    if (!names.contains(a.symbol.lexeme) && !enclosingParamNames.contains(a.symbol.lexeme)) {
+                        localDeclarations.add(new VariableDeclaration(a.symbol.lexeme));
+                        names.add(a.symbol.lexeme);
+                    }
+                }
+            }
+        }
+        statements.add(new ReturnStatement(returnExpr));
+
 
 /*
         // check for condition
@@ -325,10 +383,14 @@ public class IntermediateCode implements Expr.Visitor<Statement>, Stmt.Visitor<S
         for (int i=0; i< expr.parameters.size(); i++) {
             arguments.add(new Argument(expr.parameters.get(i).lexeme, i));
         }
+        for (int i=0; i< expr.enclosingFuncParams.size(); i++) {
+            arguments.add(new Argument(expr.enclosingFuncParams.get(i).lexeme, expr.parameters.size() + i));
+        }
 
         // add function def to builder
-        Function f = new Function(funName, List.of(stmt), arguments, List.of());
+        Function f = new Function(funName, statements, arguments, localDeclarations);
         builder.addFunction(f);
+        //statements.add(f);
 
         return new Reference(funName);
     }

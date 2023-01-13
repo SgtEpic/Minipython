@@ -1,5 +1,6 @@
 package frontend;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -114,6 +115,12 @@ public abstract class Expr {
     static class Lambda extends Expr {
         final List<Symbol> parameters;
         final Expr expr;
+
+        Boolean enclosingFunc = false;
+        Symbol enclosingFuncName = null;
+        List<Stmt> localAssignments = new ArrayList<>();
+        List<Symbol> enclosingFuncParams = new ArrayList<>();
+
         Lambda(List<Symbol> parameters, Expr expr) {
             this.parameters = parameters;
             this.expr = expr;

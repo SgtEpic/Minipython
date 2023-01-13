@@ -60,10 +60,13 @@ public abstract class Stmt {
         final Symbol symbol;
         final List<Symbol> params;
         final Block block;
-        Function(Symbol symbol, List<Symbol> params, Block block) {
+        final List<String> localDeclarations;
+        Boolean localFunction = false;
+        Function(Symbol symbol, List<Symbol> params, Block block, List<String> localDeclarations) {
             this.symbol = symbol;
             this.params = params;
             this.block = block;
+            this.localDeclarations = localDeclarations;
         }
 
         @Override

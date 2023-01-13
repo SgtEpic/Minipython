@@ -204,6 +204,9 @@ public class Symboltable implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
 
     @Override
     public Void visitLambdaExpr(Expr.Lambda expr) {
+        if (currentFunction == FunctionType.FUNCTION) {
+            expr.enclosingFunc = true;
+        }
         return null;
     }
 
@@ -279,6 +282,10 @@ public class Symboltable implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
     private void resolveFunction(Stmt.Function function, FunctionType type) {
         FunctionType enclosingFunction = currentFunction;
         currentFunction = type;
+
+        if (enclosingFunction == FunctionType.FUNCTION) {
+           function.localFunction = true;
+        }
 
         beginScope();
         for (Symbol param : function.params) {

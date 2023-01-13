@@ -1,12 +1,36 @@
-i = 5
-i++
-a = ++i
-b = i--
-print(i)
-print(a)
-print(b)
+#i = 1
+#def hallo(x):
+#    i = 2
+#    i = 4
+#    if (i == 4):
+#        i = 10
+#    else:
+#        i = 4
+#    #end
+#    return lambda y: (i + x)
+##end
 
-while(i):
-    print(i--)
-    print(i)
+#print(hallo(1,2,10)(5))
+#print(i)
+
+#x = 10
+#def outer_func(x):
+#    y = 4
+#    return lambda z: x + y + z
+##end
+
+#u = 0
+#while (u++ < 3):
+#    closure = outer_func(u)
+#    print(closure(u))
+##end
+
+
+def foo(y):
+    f = lambda x: x + y
+    o = f(10)
+    return o
 #end
+
+a = foo(5)
+print(a)
