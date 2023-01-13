@@ -12,8 +12,13 @@ import java.util.List;
 public class VistorCST extends minipythonBaseVisitor<Stmt> {
 
     public VisitorCSTExpr exprVisitor = new VisitorCSTExpr();
+    private static final ArrayList<String> filenames = new ArrayList<>();
 
     private static Stmt fileToAST(String fileName) throws IOException {
+        if(filenames.contains(fileName)){
+            throw new RuntimeException("Ringimport!");
+        }
+        filenames.add(fileName);
         minipythonLexer lexer = new minipythonLexer(CharStreams.fromFileName(fileName + ".mpy"));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         minipythonParser parser = new minipythonParser(tokens);
