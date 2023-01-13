@@ -96,7 +96,6 @@ class List:
         index = 0
         while index < len(self):
             element = self.get(index)
-            print(element)
             string = string + element.__str__() + " "
             index++
         #end
