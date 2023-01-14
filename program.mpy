@@ -28,9 +28,7 @@
 
 def foo(y):
     f = lambda x: x + y
-    o = f(10)
-    return o
+    return f
 #end
 
 a = foo(5)
-print(a)

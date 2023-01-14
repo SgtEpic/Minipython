@@ -220,6 +220,10 @@ public class IntermediateCode implements Expr.Visitor<Statement>, Stmt.Visitor<S
         }
         Reference r = new Reference(expr.symbol.lexeme);
         Expression e = (Expression) expr.value.accept(this);
+        if (e instanceof Reference) {
+            Reference reference = (Reference) e;
+            functionMap.put(r.getName(), functionMap.get(reference.getName()));
+        }
         if (e instanceof Call) {
             Call c = (Call) e;
             functionMap.put(expr.symbol.lexeme, c.getArguments());
