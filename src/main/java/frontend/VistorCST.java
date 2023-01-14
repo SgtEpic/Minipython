@@ -151,27 +151,8 @@ public class VistorCST extends minipythonBaseVisitor<Stmt> {
         Stmt.Block block = (Stmt.Block) visit(ctx.block());
 
         List<String> localVariables = new ArrayList<>();
-        Expr.Lambda lambda = null;
-        for (Stmt statement : block.statements) {
-            if (statement instanceof Stmt.Return) {
-                Stmt.Return ret = (Stmt.Return) statement;
-                if (ret.value instanceof Expr.Lambda) {
-                    lambda = (Expr.Lambda) ret.value;
-                }
-            }
-            if (statement instanceof Stmt.Expression) {
-                Stmt.Expression expr = (Stmt.Expression) statement;
-                if (expr.expression instanceof Expr.Assignment) {
-                    Expr.Assignment assignment = (Expr.Assignment) expr.expression;
-                    if (assignment.value instanceof Expr.Lambda) {
-                        lambda = (Expr.Lambda) assignment.value;
-                    }
-                }
-            }
-        }
 
-
-
+        // add local variables
         for (Stmt statement: block.statements) {
             if(statement instanceof Stmt.Expression) {
                 Stmt.Expression expr = (Stmt.Expression) statement;
@@ -181,19 +162,17 @@ public class VistorCST extends minipythonBaseVisitor<Stmt> {
                     if (!localVariables.contains(assignment.symbol.lexeme) && !paramsName.contains(assignment.symbol.lexeme)) {
                         localVariables.add(assignment.symbol.lexeme);
                     }
-                  /*  if (lambda != null) {
-                        lambda.localAssignments.add(assignment);
-                    }*/
                 }
             }
         }
 
-        // copy lambda assignments till lambda expression occurs
-        for (Stmt statement: block.statements) {
+        // fun with lambda expr
+        List<Expr.Lambda> lambda = new ArrayList<>();
+        for (Stmt statement : block.statements) {
             if (statement instanceof Stmt.Return) {
                 Stmt.Return ret = (Stmt.Return) statement;
                 if (ret.value instanceof Expr.Lambda) {
-                    break;
+                    lambda.add((Expr.Lambda) ret.value);
                 }
             }
             if (statement instanceof Stmt.Expression) {
@@ -201,27 +180,47 @@ public class VistorCST extends minipythonBaseVisitor<Stmt> {
                 if (expr.expression instanceof Expr.Assignment) {
                     Expr.Assignment assignment = (Expr.Assignment) expr.expression;
                     if (assignment.value instanceof Expr.Lambda) {
-                        break;
+                        lambda.add((Expr.Lambda) assignment.value);
                     }
                 }
             }
-            if (statement instanceof Stmt.Function) {
-                continue;
-            }
-            if (statement instanceof Stmt.Class) {
-                continue;
-            }
-            if (lambda != null) {
-                lambda.localAssignments.add(statement);
+        }
+
+        for (Expr.Lambda l : lambda) {
+
+            // copy lambda assignments till lambda expression occurs
+            for (Stmt statement : block.statements) {
+                if (statement instanceof Stmt.Return) {
+                    Stmt.Return ret = (Stmt.Return) statement;
+                    if (ret.value instanceof Expr.Lambda) {
+                        break;
+                    }
+                }
+                if (statement instanceof Stmt.Expression) {
+                    Stmt.Expression expr = (Stmt.Expression) statement;
+                    if (expr.expression instanceof Expr.Assignment) {
+                        Expr.Assignment assignment = (Expr.Assignment) expr.expression;
+                        if (assignment.value instanceof Expr.Lambda) {
+                            if (l.equals((Expr.Lambda) assignment.value)) {
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (statement instanceof Stmt.Function) {
+                    continue;
+                }
+                if (statement instanceof Stmt.Class) {
+                    continue;
+                }
+                l.localAssignments.add(statement);
             }
         }
 
-        if (lambda != null) {
-            lambda.enclosingFuncName = name;
-        }
-        for (Symbol param: params) {
-            if (lambda != null) {
-                lambda.enclosingFuncParams.add(param);
+        for (Expr.Lambda l: lambda) {
+            l.enclosingFuncName = name;
+            for (Symbol param : params) {
+                l.enclosingFuncParams.add(param);
             }
         }
 

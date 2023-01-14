@@ -39,6 +39,10 @@ public class IntermediateCode implements Expr.Visitor<Statement>, Stmt.Visitor<S
 
     Map<String, List<Expression>> functionMap = new HashMap<>();
 
+    Stmt.Function currentVisitingFunction = null;
+
+    List<String> builtInFunctions = List.of("__init__", "append", "insert", "get", "set", "__len__", "removeIndex", "removeItem", "pop", "clear", "index", "count", "copy", "__str__", "filter", "map", "reduce");
+
     IntermediateCode(ProgramBuilder programBuilder, Path fileOutput) {
         this.builder = programBuilder;
         this.fileOutput = fileOutput;
@@ -117,6 +121,7 @@ public class IntermediateCode implements Expr.Visitor<Statement>, Stmt.Visitor<S
 
     @Override
     public Statement visitFunctionStmt(Stmt.Function stmt) {
+        currentVisitingFunction = stmt;
         // arguments
         int argumentAmount = 0;
         int argumentAmountBeforePacking = 0;
@@ -155,6 +160,7 @@ public class IntermediateCode implements Expr.Visitor<Statement>, Stmt.Visitor<S
             localVariables.add(new VariableDeclaration(name));
         });
 
+        currentVisitingFunction = null;
         return new Function(stmt.symbol.lexeme, body, arguments, localVariables);
     }
 
@@ -303,13 +309,19 @@ public class IntermediateCode implements Expr.Visitor<Statement>, Stmt.Visitor<S
         // assign lambda to variable
         if (callee instanceof Reference) {
             Reference reference = (Reference) callee;
-            System.out.println(reference.getName());
             List<Expression> args = functionMap.get(reference.getName());
             if (args != null) {
                 for (Expression argument : args) {
                     arguments.add(argument);
                 }
-            }
+           }
+           if (currentVisitingFunction != null) {
+                if (!builtInFunctions.contains(currentVisitingFunction.symbol.lexeme)) {
+                    for (Symbol s : currentVisitingFunction.params) {
+                        arguments.add(new Reference(s.lexeme));
+                    }
+                }
+           }
         }
         return new Call(callee, arguments);
     }
