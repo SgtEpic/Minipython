@@ -41,7 +41,7 @@ public class IntermediateCode implements Expr.Visitor<Statement>, Stmt.Visitor<S
 
     Stmt.Function currentVisitingFunction = null;
 
-    List<String> builtInFunctions = List.of("__init__", "append", "insert", "get", "set", "__len__", "removeIndex", "removeItem", "pop", "clear", "index", "count", "copy", "__str__", "filter", "map", "reduce");
+    List<String> builtInFunctions = List.of("__init__", "append", "insert", "get", "set", "__len__", "removeIndex", "removeItem", "pop", "clear", "index", "count", "copy", "__str__", "filter", "map", "reduce", "print", "input", "id", "len", "super", "type", "raw_list");
 
     IntermediateCode(ProgramBuilder programBuilder, Path fileOutput) {
         this.builder = programBuilder;
@@ -316,11 +316,17 @@ public class IntermediateCode implements Expr.Visitor<Statement>, Stmt.Visitor<S
                 }
            }
            if (currentVisitingFunction != null) {
-                if (!builtInFunctions.contains(currentVisitingFunction.symbol.lexeme)) {
-                    for (Symbol s : currentVisitingFunction.params) {
-                        arguments.add(new Reference(s.lexeme));
-                    }
-                }
+               if (!builtInFunctions.contains(currentVisitingFunction.symbol.lexeme)) {
+                   if (!builtInFunctions.contains(callee.buildExpression())) {
+                       if(!currentVisitingFunction.symbol.lexeme.equals(callee.buildExpression())) {
+                           System.out.println("currentVisitingFunction: " + currentVisitingFunction.symbol.lexeme);
+                           System.out.println("callee: " + callee.buildExpression());
+                           for (Symbol s : currentVisitingFunction.params) {
+                               arguments.add(new Reference(s.lexeme));
+                           }
+                       }
+                   }
+               }
            }
         }
         return new Call(callee, arguments);
